@@ -33,51 +33,51 @@ A complete AI assistant that can answer questions about your custom knowledge ba
 - **🔐 Security Included**: JWT authentication and best practices
 - **💡 Best Practices**: Modern Python, FastAPI, and AI development patterns
 
-## 🎯 プロジェクトの特徴
+## ✨ Key Features
 
-### ✨ 独自の価値
+### 🎯 What Makes This Special
 
-- 🎓 **教育的優秀性**: TDD手法、包括的ドキュメント
-- ⚡ **即座に利用可能**: 複雑な設定不要
-- 🎨 **カスタマイズ性**: YAML設定、ドメイン非依存
-- 🍜 **実例豊富**: 日本料理レシピによる実用デモ
-- 🔄 **効率的更新**: インクリメンタル更新機能
-- 🔌 **MCP対応**: Claude Desktop からツールとして直接利用可能
+- 🎓 **Educational Excellence**: TDD methodology, comprehensive documentation
+- ⚡ **Ready to Use**: No complex setup required
+- 🎨 **Highly Customizable**: YAML configuration, domain-agnostic design
+- 🍜 **Rich Examples**: Japanese recipe knowledge base for practical demonstration
+- 🔄 **Efficient Updates**: Incremental update functionality
+- 🔌 **MCP Compatible**: Direct integration with Claude Desktop as tools
 
 ## 🔌 MCP Server Support
 
-**Claude Desktop との直接統合をサポート**
+**Direct Integration with Claude Desktop**
 
-RAG Starter Kit は Model Context Protocol (MCP) をサポートし、Claude Desktop からツールとして直接使用できます。
+RAG Starter Kit supports Model Context Protocol (MCP) and can be used directly as tools from Claude Desktop.
 
-### 🚀 MCP クイックスタート
+### 🚀 MCP Quick Start
 
 ```bash
-# Python 3.11環境を作成
+# Create Python 3.11 environment
 python3.11 -m venv venv
 source venv/bin/activate
 
-# 依存関係をインストール（MCPライブラリ含む）
+# Install dependencies (including MCP library)
 pip install -r requirements.txt
 
-# MCPサーバーをテスト
-python test_mcp_server.py
+# Test MCP server
+python demo/test_mcp_server.py
 
-# MCPサーバーを起動
+# Start MCP server
 python mcp_rag_server.py
 ```
 
-### 🛠️ 利用可能なツール
+### 🛠️ Available Tools
 
-- `query_knowledge_base` - 知識ベースに質問
-- `search_documents` - キーワード検索
-- `get_available_documents` - ドキュメント一覧
-- `get_server_status` - サーバーステータス
+- `query_knowledge_base` - Query the knowledge base
+- `search_documents` - Keyword search
+- `get_available_documents` - List documents
+- `get_server_status` - Server status
 
-**設定テンプレート**: `claude_desktop_config_template.json` を使用  
-**詳細な設定方法**: [MCP Setup Guide](MCP_SETUP.md)
+**Configuration Template**: Use `claude_desktop_config_template.json`  
+**Detailed Setup**: [MCP Setup Guide](MCP_SETUP.md)
 
-⚠️ **セキュリティ注意**: APIキーを含む設定ファイルは絶対にGitにコミットしないでください！
+⚠️ **Security Warning**: Never commit configuration files containing API keys to Git!
 
 
 ## 🏗️ Learning Architecture

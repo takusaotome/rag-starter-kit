@@ -86,13 +86,15 @@ async def init_rag_server():
 @mcp.tool()
 async def query_knowledge_base(question: str) -> str:
     """
-    知識ベースに質問して回答を取得する
+    カスタム知識ベースに質問して回答を取得する
+    
+    この知識ベースの詳細な内容についてはget_server_statusツールを使用して確認できます。
     
     Args:
-        question: 質問内容（日本語または英語）
+        question: 知識ベースに関する質問（日本語または英語）
     
     Returns:
-        str: 知識ベースに基づく回答
+        str: 知識ベースに基づく詳細な回答
     """
     global rag_server
     
@@ -121,14 +123,14 @@ async def query_knowledge_base(question: str) -> str:
 @mcp.tool()
 async def search_documents(keywords: str, max_results: int = 5) -> str:
     """
-    キーワードで関連ドキュメントを検索する
+    知識ベースのドキュメントをキーワードで検索する
     
     Args:
         keywords: 検索キーワード
         max_results: 返す結果の最大数（デフォルト: 5）
     
     Returns:
-        str: 検索結果のリスト
+        str: ドキュメントの検索結果リスト
     """
     global rag_server
     
@@ -256,10 +258,10 @@ async def debug_paths() -> str:
 @mcp.tool()
 async def get_server_status() -> str:
     """
-    RAGサーバーの現在のステータスを取得する
+    RAGサーバーの現在のステータスと知識ベースの詳細情報を取得する
     
     Returns:
-        str: サーバーステータス情報
+        str: サーバーステータスと知識ベースの内容情報
     """
     global rag_server
     
@@ -301,10 +303,121 @@ async def get_server_status() -> str:
         else:
             status_info += "❌ 知識ベース: ディレクトリなし\n"
         
+        # 知識ベースの詳細情報を追加
+        status_info += "\n📚 **Knowledge Base Information:**\n"
+        kb_info = analyze_knowledge_base()
+        
+        status_info += f"📖 **{kb_info.get('title', 'Knowledge Base')}**\n"
+        status_info += f"概要: {kb_info.get('description', 'カスタム知識ベース')}\n"
+        
+        categories = kb_info.get('categories', [])
+        if categories:
+            status_info += "\n📋 **含まれる内容:**\n"
+            for category in categories:
+                status_info += f"- {category}\n"
+        
+        example_queries = kb_info.get('example_queries', [])
+        if example_queries:
+            status_info += "\n💡 **質問例:**\n"
+            for query in example_queries:
+                status_info += f"- {query}\n"
+        
+        expertise_level = kb_info.get('expertise_level')
+        if expertise_level:
+            status_info += f"\n🎯 **専門レベル:** {expertise_level}\n"
+        
+        languages = kb_info.get('languages', [])
+        if languages:
+            status_info += f"🌍 **対応言語:** {', '.join(languages)}\n"
+        
         return status_info
         
     except Exception as e:
         return f"❌ ステータス取得エラー: {str(e)}"
+
+
+def analyze_knowledge_base():
+    """
+    知識ベースの内容を分析して説明を生成する
+    
+    Returns:
+        dict: 知識ベースの概要情報
+    """
+    try:
+        from config import MCP_SERVER_CONFIG
+        # 設定ファイルから情報を取得
+        return MCP_SERVER_CONFIG.get("knowledge_base_description", {})
+    except ImportError:
+        # 設定ファイルがない場合は動的に分析
+        return analyze_knowledge_base_dynamically()
+
+
+def analyze_knowledge_base_dynamically():
+    """
+    知識ベースのファイルを動的に分析して概要を生成
+    
+    Returns:
+        dict: 分析結果
+    """
+    try:
+        knowledge_path = SCRIPT_DIR / "knowledge"
+        if not knowledge_path.exists():
+            return {"title": "Knowledge Base", "description": "Custom knowledge base"}
+        
+        md_files = list(knowledge_path.glob("*.md"))
+        if not md_files:
+            return {"title": "Knowledge Base", "description": "Custom knowledge base"}
+        
+        # ファイル名から内容を推測
+        categories = []
+        for file_path in sorted(md_files):
+            file_name = file_path.stem
+            # ファイル名から日本語や英語のカテゴリを推測
+            if any(keyword in file_name.lower() for keyword in ['rice', 'dish', '料理']):
+                categories.append(f"ファイル: {file_name}")
+        
+        return {
+            "title": "汎用知識ベース",
+            "description": f"{len(md_files)}個のドキュメントを含む知識ベース",
+            "categories": categories[:10],  # 最大10個まで
+            "file_count": len(md_files),
+            "languages": ["日本語", "English"],
+            "expertise_level": "カスタム知識ベース"
+        }
+    except Exception as e:
+        return {
+            "title": "Knowledge Base",
+            "description": f"Custom knowledge base (Analysis error: {str(e)})"
+        }
+
+
+def get_knowledge_base_description():
+    """
+    知識ベースの説明を取得してツールの説明文を生成
+    
+    Returns:
+        str: ツール用の説明文
+    """
+    kb_info = analyze_knowledge_base()
+    
+    title = kb_info.get("title", "知識ベース")
+    description = kb_info.get("description", "カスタム知識ベース")
+    categories = kb_info.get("categories", [])
+    
+    desc_text = f"{title}に質問して回答を取得する\n\n{description}"
+    
+    if categories:
+        desc_text += "\n\n含まれる内容:"
+        for category in categories:
+            desc_text += f"\n- {category}"
+    
+    example_queries = kb_info.get("example_queries", [])
+    if example_queries:
+        desc_text += "\n\n例："
+        for query in example_queries[:3]:  # 最大3つまで
+            desc_text += f"\n- {query}"
+    
+    return desc_text
 
 
 if __name__ == "__main__":

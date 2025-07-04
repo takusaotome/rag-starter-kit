@@ -10,16 +10,4 @@
       }
     }
   }
-}
-
-// 🔐 SECURITY INSTRUCTIONS (Remove this comment section before use):
-//
-// 1. Replace "YOUR_ACTUAL_OPENAI_API_KEY_HERE" with your real OpenAI API key
-// 2. Replace "/ABSOLUTE/PATH/TO/YOUR/PROJECT/" with your actual project path
-// 3. Save this file as "claude_desktop_config.json" in:
-//    macOS: ~/Library/Application Support/Claude/claude_desktop_config.json
-//    Windows: %AppData%\Claude\claude_desktop_config.json
-// 4. NEVER commit this file to Git once you add your real API key!
-//
-// ⚠️  WARNING: Never share this file or commit it to version control 
-//              once you've added your real API key! 
+} 

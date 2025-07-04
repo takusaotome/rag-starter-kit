@@ -40,6 +40,42 @@ RAG Starter Kitは、実装を通じてRAG技術を学び理解することを�
 - 🎨 **カスタマイズ性**: YAML設定、ドメイン非依存
 - 🍜 **実例豊富**: 日本料理レシピによる実用デモ
 - 🔄 **効率的更新**: インクリメンタル更新機能
+- 🔌 **MCP対応**: Claude Desktop からツールとして直接利用可能
+
+## 🔌 MCP Server Support
+
+**Claude Desktop との直接統合をサポート**
+
+RAG Starter Kit は Model Context Protocol (MCP) をサポートし、Claude Desktop からツールとして直接使用できます。
+
+### 🚀 MCP クイックスタート
+
+```bash
+# Python 3.11環境を作成
+python3.11 -m venv venv
+source venv/bin/activate
+
+# 依存関係をインストール（MCPライブラリ含む）
+pip install -r requirements.txt
+
+# MCPサーバーをテスト
+python demo/test_mcp_server.py
+
+# MCPサーバーを起動
+python mcp_rag_server.py
+```
+
+### 🛠️ 利用可能なツール
+
+- `query_knowledge_base` - 知識ベースに質問
+- `search_documents` - キーワード検索
+- `get_available_documents` - ドキュメント一覧
+- `get_server_status` - サーバーステータス
+
+**設定テンプレート**: `claude_desktop_config_template.json` を使用  
+**詳細な設定方法**: [MCP Setup Guide](MCP_SETUP.md)
+
+⚠️ **セキュリティ注意**: APIキーを含む設定ファイルは絶対にGitにコミットしないでください！
 
 
 ## 🏗️ 学習アーキテクチャ
