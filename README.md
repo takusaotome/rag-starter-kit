@@ -74,6 +74,7 @@ python mcp_rag_server.py
 - `get_available_documents` - ドキュメント一覧
 - `get_server_status` - サーバーステータス
 
+**設定テンプレート**: `claude_desktop_config_template.json` を使用  
 **詳細な設定方法**: [MCP Setup Guide](MCP_SETUP.md)
 
 ⚠️ **セキュリティ注意**: APIキーを含む設定ファイルは絶対にGitにコミットしないでください！

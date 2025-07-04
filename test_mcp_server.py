@@ -82,7 +82,7 @@ def create_claude_config():
         }
     }
     
-    config_file = current_dir / "claude_desktop_config_example.json"
+    config_file = current_dir / "claude_desktop_config_template.json"
     with open(config_file, 'w', encoding='utf-8') as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
     

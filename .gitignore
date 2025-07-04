@@ -14,7 +14,7 @@ jwt_secret.txt
 auth_tokens/
 
 # MCP/Claude Desktop設定ファイル（APIキー含む可能性）
-claude_desktop_config_fixed.json
+claude_desktop_config.json
 claude_desktop_config_production.json
 *_config_with_key*.json
 mcp_config_*.json

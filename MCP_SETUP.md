@@ -68,7 +68,7 @@ python test_mcp_server.py
 
 1. **テンプレートファイルをコピー**:
    ```bash
-   cp claude_desktop_config_secure_template.json ~/temp_config.json
+   cp claude_desktop_config_template.json ~/temp_config.json
    ```
 
 2. **テンプレートファイルを編集**:
