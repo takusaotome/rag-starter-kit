@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "rag-starter-kit": {
+      "command": "python",
+      "args": [
+        "/Users/takueisaotome/PycharmProjects/rag-starter-kit/mcp_rag_server.py"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    }
+  }
+}
