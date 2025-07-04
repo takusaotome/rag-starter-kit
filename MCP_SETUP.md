@@ -62,27 +62,46 @@ python test_mcp_server.py
 
 ### 2. 設定ファイルの作成・編集
 
-`claude_desktop_config.json`を作成または編集:
+⚠️ **セキュリティ重要**: APIキーが含まれる設定ファイルは絶対にGitにコミットしないでください！
 
-```json
-{
-  "mcpServers": {
-    "rag-starter-kit": {
-      "command": "python",
-      "args": [
-        "/ABSOLUTE/PATH/TO/YOUR/PROJECT/rag-starter-kit/mcp_rag_server.py"
-      ],
-      "env": {
-        "OPENAI_API_KEY": "your_openai_api_key_here"
-      }
-    }
-  }
-}
-```
+#### セキュアな設定手順：
 
-**重要**: 
-- `/ABSOLUTE/PATH/TO/YOUR/PROJECT/` を実際のプロジェクトパスに変更
-- `your_openai_api_key_here` を実際のAPIキーに変更
+1. **テンプレートファイルをコピー**:
+   ```bash
+   cp claude_desktop_config_secure_template.json ~/temp_config.json
+   ```
+
+2. **テンプレートファイルを編集**:
+   ```json
+   {
+     "mcpServers": {
+       "rag-starter-kit": {
+         "command": "/Users/takueisaotome/PycharmProjects/rag-starter-kit/venv/bin/python",
+         "args": [
+           "/Users/takueisaotome/PycharmProjects/rag-starter-kit/mcp_rag_server.py"
+         ],
+         "env": {
+           "OPENAI_API_KEY": "sk-proj-YOUR_ACTUAL_API_KEY_HERE"
+         }
+       }
+     }
+   }
+   ```
+
+3. **正しい場所に移動**:
+   ```bash
+   # macOS
+   mv ~/temp_config.json ~/Library/Application\ Support/Claude/claude_desktop_config.json
+   
+   # Windows (PowerShell)
+   # Move-Item ~/temp_config.json $env:AppData/Claude/claude_desktop_config.json
+   ```
+
+**🔐 セキュリティチェックリスト**:
+- ✅ 実際のAPIキーをプロジェクトファイルに含めない
+- ✅ .gitignoreで機密ファイルを除外済み
+- ✅ 設定ファイルはClaude Desktopの指定場所のみに配置
+- ❌ プロジェクトディレクトリに実APIキー入り設定ファイルを置かない
 
 ### 3. Claude Desktop の再起動
 

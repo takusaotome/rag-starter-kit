@@ -25,6 +25,26 @@ from server import RAGServer
 # .envファイルを読み込み（絶対パス）
 load_dotenv(SCRIPT_DIR / ".env")
 
+# 環境変数の確認と警告
+if not os.getenv("OPENAI_API_KEY"):
+    print("⚠️  Warning: OPENAI_API_KEY not found in environment variables")
+    print("🔍 Checking .env file...")
+    
+    env_file = SCRIPT_DIR / ".env"
+    if env_file.exists():
+        with open(env_file, 'r') as f:
+            content = f.read()
+            if "OPENAI_API_KEY=" in content:
+                # .envファイルから直接読み込み
+                for line in content.split('\n'):
+                    if line.startswith('OPENAI_API_KEY='):
+                        api_key = line.split('=', 1)[1].strip()
+                        os.environ['OPENAI_API_KEY'] = api_key
+                        print("✅ OPENAI_API_KEY loaded from .env file")
+                        break
+else:
+    print("✅ OPENAI_API_KEY found in environment variables")
+
 # FastMCPサーバーを初期化
 mcp = FastMCP("rag-starter-kit")
 

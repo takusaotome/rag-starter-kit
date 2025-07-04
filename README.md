@@ -76,6 +76,8 @@ python mcp_rag_server.py
 
 **詳細な設定方法**: [MCP Setup Guide](MCP_SETUP.md)
 
+⚠️ **セキュリティ注意**: APIキーを含む設定ファイルは絶対にGitにコミットしないでください！
+
 
 ## 🏗️ Learning Architecture
 

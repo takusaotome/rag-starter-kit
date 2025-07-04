@@ -66,15 +66,15 @@ async def test_mcp_server():
 
 
 def create_claude_config():
-    """Claude Desktop設定ファイルを作成する"""
+    """Claude Desktop設定ファイルを作成する（セキュアなテンプレート）"""
     current_dir = Path.cwd()
-    server_path = current_dir / "mcp_rag_server.py"
     
+    # セキュリティのため、実際のパスではなくプレースホルダーを使用
     config = {
         "mcpServers": {
             "rag-starter-kit": {
-                "command": "python",
-                "args": [str(server_path)],
+                "command": "/ABSOLUTE/PATH/TO/YOUR/PROJECT/rag-starter-kit/venv/bin/python",
+                "args": ["/ABSOLUTE/PATH/TO/YOUR/PROJECT/rag-starter-kit/mcp_rag_server.py"],
                 "env": {
                     "OPENAI_API_KEY": "${OPENAI_API_KEY}"
                 }
@@ -86,14 +86,17 @@ def create_claude_config():
     with open(config_file, 'w', encoding='utf-8') as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
     
-    print(f"\n📄 Claude Desktop設定ファイルを作成しました: {config_file}")
+    print(f"\n📄 Claude Desktop設定テンプレートを作成しました: {config_file}")
     print("\n🔧 **Claude Desktopで使用する手順:**")
     print("1. Claude Desktopをインストール（最新版）")
-    print("2. 設定ファイルを以下の場所にコピー:")
+    print("2. 設定ファイルのパスを実際のプロジェクトパスに変更")
+    print("   '/ABSOLUTE/PATH/TO/YOUR/PROJECT/' → 実際のパス")
+    print("3. 設定ファイルを以下の場所にコピー:")
     print("   macOS: ~/Library/Application Support/Claude/claude_desktop_config.json")
     print("   Windows: %AppData%\\Claude\\claude_desktop_config.json")
-    print("3. Claude Desktopを再起動")
-    print("4. 「Search and tools」アイコンが表示されることを確認")
+    print("4. Claude Desktopを再起動")
+    print("5. 「Search and tools」アイコンが表示されることを確認")
+    print("\n⚠️  **セキュリティ重要**: APIキーを設定後は絶対にGitにコミットしないでください！")
     
     return config_file
 

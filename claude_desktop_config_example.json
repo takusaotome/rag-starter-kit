@@ -1,9 +1,9 @@
 {
   "mcpServers": {
     "rag-starter-kit": {
-      "command": "python",
+      "command": "/ABSOLUTE/PATH/TO/YOUR/PROJECT/rag-starter-kit/venv/bin/python",
       "args": [
-        "/Users/takueisaotome/PycharmProjects/rag-starter-kit/mcp_rag_server.py"
+        "/ABSOLUTE/PATH/TO/YOUR/PROJECT/rag-starter-kit/mcp_rag_server.py"
       ],
       "env": {
         "OPENAI_API_KEY": "${OPENAI_API_KEY}"
