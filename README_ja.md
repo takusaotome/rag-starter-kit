@@ -78,8 +78,8 @@ RAG Starter Kitは、実装を通じてRAG技術を学び理解することを�
 
 ```bash
 # リポジトリクローン
-git clone <repository-url>
-cd rag-api
+git clone https://github.com/takusaotome/rag-starter-kit
+cd rag-starter-kit
 
 # Python仮想環境作成（Python 3.11推奨）
 python3.11 -m venv venv

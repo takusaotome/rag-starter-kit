@@ -1,9 +1,18 @@
 # 🍜 AIおばあちゃんの作り方 - 初心者でも10分で作れる！RAG搭載チャットボット物語
 
+> **10分で自分だけのRAG搭載AIチャットボットを作成。料理レシピを覚えた「AIおばあちゃん」との会話を通じて、検索拡張生成（RAG）技術を楽しく学べる実践的チュートリアル。**
+
 > 「孫よ、今日はおばあちゃんの秘密のレシピを教えてあげるわ。でも、これは料理のレシピじゃないの。AIのレシピよ。」
 
 ## 📖 目次
 
+### 🚀 クイックスタート（10分コース）
+1. [環境構築](#第2章：材料を準備しよう---開発環境構築) → 2分
+2. [ベクトルストア作成](#第4章：記憶の魔法---ベクトルストアの秘密) → 3分
+3. [サーバー起動](#第7章：魔法の完成---動作確認とカスタマイズ) → 2分
+4. [動作確認](#第7章：魔法の完成---動作確認とカスタマイズ) → 3分
+
+### 📚 詳細学習
 1. [プロローグ：AIおばあちゃんとの出会い](#プロローグ：AIおばあちゃんとの出会い)
 2. [第1章：RAGって何？不思議な技術の正体](#第1章：RAGって何？不思議な技術の正体)
 3. [第2章：材料を準備しよう - 開発環境構築](#第2章：材料を準備しよう---開発環境構築)
@@ -41,7 +50,7 @@ cd rag-starter-kit
 
 「こんにちは、太郎くん。私がAIおばあちゃんよ。今日は、RAGという不思議な技術について教えてあげるわ。」
 
-**RAG（Retrieval-Augmented Generation）**とは、日本語で「検索拡張生成」という意味。
+**RAG（Retrieval-Augmented Generation）**とは、日本語で「検索拡張生成」という意味。簡単に言えば、AIに「記憶帳」を持たせて、より正確で詳しい回答をできるようにする技術です。
 
 ### 🧠 普通のAIとRAG搭載AIの違い
 
@@ -103,18 +112,32 @@ Uvicorn      # ASGIサーバー
 
 ### 📦 環境構築の手順
 
+#### ⚡ 超高速セットアップ（2分）
+
 ```bash
-# 1. 仮想環境を作成（料理で言う「清潔な調理場」）
+# 1. プロジェクトのダウンロード
+git clone https://github.com/takusaotome/rag-starter-kit.git
+cd rag-starter-kit
+
+# 2. 仮想環境を作成（料理で言う「清潔な調理場」）
 python3 -m venv venv
 source venv/bin/activate  # Windowsの場合: venv\Scripts\activate
 
-# 2. 材料を調達（パッケージインストール）
+# 3. 材料を調達（パッケージインストール）
 pip install -r requirements.txt
 
-# 3. 秘密の調味料を準備（API Key設定）
-# .envファイルを作成
+# 4. 秘密の調味料を準備（API Key設定）
+export OPENAI_API_KEY="your-api-key-here"
+# または .envファイルを作成
 echo "OPENAI_API_KEY=your-api-key-here" > .env
-echo "JWT_SECRET_KEY=your-secret-key" >> .env
+```
+
+#### ✅ 動作確認
+```bash
+# 正常にインストールされたかチェック
+python3 -c "import langchain; print('✅ LangChain OK')"
+python3 -c "import fastapi; print('✅ FastAPI OK')"
+echo $OPENAI_API_KEY | head -c 10 && echo "... ✅ API Key OK"
 ```
 
 **💡 初心者向けTips**
@@ -165,6 +188,8 @@ ls knowledge/
 
 ### 🔧 あなたの知識ベースを作る方法
 
+#### 🎯 5分で知識ベースをカスタマイズ
+
 **Step 1: 既存のファイルを参考にしよう**
 
 ```bash
@@ -190,15 +215,21 @@ def greet(name):
 **Step 3: 構造化されたフォーマットを心がけよう**
 
 ```markdown
-# 良い例
+# ✅ 良い例（RAGが理解しやすい）
 ## 見出し
 ### 概要
 ### 詳細手順
 ### 注意点
 
-# 悪い例
+# ❌ 悪い例（RAGが混乱する）
 適当にテキストを羅列...
 ```
+
+#### 💡 知識ベース作成のコツ
+- **1つのファイルは1つのトピック**に集中
+- **見出しは具体的**に（「使い方」→「Pythonでの使い方」）
+- **コード例は実際に動作するもの**を記載
+- **よくある質問**も含める
 
 ---
 
@@ -232,11 +263,21 @@ similarity = cosine_similarity(vector1, vector2)
 # 0.85（とても似ている）
 ```
 
-### 🏗️ ベクトルストアを構築しよう
+### 🏗️ ベクトルストアを構築しよう（3分）
 
 ```bash
-# 知識ベースをベクトル化
+# 知識ベースをベクトル化（このコマンドでAIが料理レシピを記憶します）
 python3 run_etl.py
+```
+
+#### ✅ 成功メッセージを確認：
+```
+📚 Processing knowledge files...
+✅ Loaded 01_basic_rice_dishes.md (1,234 characters)
+✅ Loaded 02_noodle_dishes.md (2,345 characters)
+🔄 Creating vector embeddings...
+✅ Vector store created successfully!
+💾 Saved to vector_store/ directory
 ```
 
 実行すると、以下のような魔法が起こる：
