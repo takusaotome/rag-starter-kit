@@ -5,17 +5,25 @@ MCPプロトコル経由でRAG機能にアクセスできるシンプルなサ�
 
 import os
 import asyncio
+import sys
 from typing import Any, Dict, List
 from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 
+# スクリプトのディレクトリを取得してパスを設定
+SCRIPT_DIR = Path(__file__).parent.absolute()
+os.chdir(SCRIPT_DIR)  # 作業ディレクトリを変更
+
+# プロジェクトディレクトリをPythonパスに追加
+sys.path.insert(0, str(SCRIPT_DIR))
+
 # 既存のRAGServerをインポート
 from server import RAGServer
 
-# .envファイルを読み込み
-load_dotenv()
+# .envファイルを読み込み（絶対パス）
+load_dotenv(SCRIPT_DIR / ".env")
 
 # FastMCPサーバーを初期化
 mcp = FastMCP("rag-starter-kit")
@@ -29,9 +37,30 @@ async def init_rag_server():
     global rag_server
     if rag_server is None:
         print("🔄 Initializing RAG server...")
-        rag_server = RAGServer()
-        rag_server.initialize()
-        print("✅ RAG server initialization completed!")
+        print(f"📁 Current working directory: {os.getcwd()}")
+        print(f"📁 Script directory: {SCRIPT_DIR}")
+        
+        # 必要なファイルの存在確認
+        required_paths = [
+            SCRIPT_DIR / "knowledge",
+            SCRIPT_DIR / "vector_store", 
+            SCRIPT_DIR / ".env",
+            SCRIPT_DIR / "config.py"
+        ]
+        
+        for path in required_paths:
+            if path.exists():
+                print(f"✅ Found: {path}")
+            else:
+                print(f"❌ Missing: {path}")
+        
+        try:
+            rag_server = RAGServer()
+            rag_server.initialize()
+            print("✅ RAG server initialization completed!")
+        except Exception as e:
+            print(f"❌ RAG server initialization failed: {e}")
+            raise
 
 
 @mcp.tool()
@@ -131,7 +160,7 @@ async def get_available_documents() -> str:
         str: ドキュメント一覧
     """
     try:
-        knowledge_path = Path("knowledge")
+        knowledge_path = SCRIPT_DIR / "knowledge"
         
         if not knowledge_path.exists():
             return "❌ knowledgeディレクトリが見つかりません"
@@ -159,6 +188,52 @@ async def get_available_documents() -> str:
 
 
 @mcp.tool()
+async def debug_paths() -> str:
+    """
+    デバッグ用：パス情報を詳細に表示
+    
+    Returns:
+        str: パス情報
+    """
+    try:
+        debug_info = "🔍 **Debug Path Information**\n\n"
+        
+        debug_info += f"📁 Current working directory: {os.getcwd()}\n"
+        debug_info += f"📁 Script directory: {SCRIPT_DIR}\n"
+        debug_info += f"📁 Script file: {__file__}\n\n"
+        
+        # 重要なパスの確認
+        paths_to_check = [
+            ("knowledge", SCRIPT_DIR / "knowledge"),
+            ("vector_store", SCRIPT_DIR / "vector_store"),
+            (".env", SCRIPT_DIR / ".env"),
+            ("config.py", SCRIPT_DIR / "config.py"),
+            ("server.py", SCRIPT_DIR / "server.py")
+        ]
+        
+        debug_info += "📋 **Path Check Results:**\n"
+        for name, path in paths_to_check:
+            if path.exists():
+                if path.is_file():
+                    size = path.stat().st_size
+                    debug_info += f"✅ {name}: {path} ({size} bytes)\n"
+                else:
+                    files = list(path.glob("*"))
+                    debug_info += f"✅ {name}: {path} ({len(files)} files)\n"
+            else:
+                debug_info += f"❌ {name}: {path} (NOT FOUND)\n"
+        
+        # 環境変数の確認
+        debug_info += f"\n🔑 **Environment Variables:**\n"
+        debug_info += f"OPENAI_API_KEY: {'Set' if os.getenv('OPENAI_API_KEY') else 'Not set'}\n"
+        
+        return debug_info
+        
+    except Exception as e:
+        return f"❌ Debug path error: {str(e)}"
+
+
+@mcp.tool()
 async def get_server_status() -> str:
     """
     RAGサーバーの現在のステータスを取得する
@@ -170,6 +245,10 @@ async def get_server_status() -> str:
     
     try:
         status_info = "🚀 **RAG Starter Kit MCP Server Status**\n\n"
+        
+        # 作業ディレクトリ情報を追加
+        status_info += f"📁 作業ディレクトリ: {os.getcwd()}\n"
+        status_info += f"📁 スクリプトディレクトリ: {SCRIPT_DIR}\n\n"
         
         if rag_server is None:
             status_info += "⚠️  RAGサーバー: 未初期化\n"
@@ -195,7 +274,7 @@ async def get_server_status() -> str:
         status_info += f"{openai_key_set} OpenAI API Key: {'設定済み' if openai_key_set == '✅' else '未設定'}\n"
         
         # 知識ベースディレクトリの確認
-        knowledge_path = Path("knowledge")
+        knowledge_path = SCRIPT_DIR / "knowledge"
         if knowledge_path.exists():
             md_files = list(knowledge_path.glob("*.md"))
             status_info += f"✅ 知識ベース: {len(md_files)} ファイル\n"
@@ -211,11 +290,14 @@ async def get_server_status() -> str:
 if __name__ == "__main__":
     print("🎯 RAG Starter Kit MCP Server starting...")
     print("🔗 MCP Protocol: stdio transport")
+    print(f"📁 Working directory: {os.getcwd()}")
+    print(f"📁 Script directory: {SCRIPT_DIR}")
     print("🛠️  Available tools:")
     print("   - query_knowledge_base: 知識ベースに質問")
     print("   - search_documents: ドキュメント検索")
     print("   - get_available_documents: ドキュメント一覧")
     print("   - get_server_status: サーバーステータス")
+    print("   - debug_paths: パス情報デバッグ")
     print("🚀 Server ready!")
     
     # MCPサーバーを起動（stdio transport使用）
