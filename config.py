@@ -25,6 +25,11 @@ class Config:
     HOST = os.getenv("HOST", "0.0.0.0")
     PORT = int(os.getenv("PORT", "8000"))
     SERVER_URL = os.getenv("SERVER_URL", "http://localhost:8000")
+    
+    # CORS設定
+    CORS_ORIGINS = os.getenv("CORS_ORIGINS", 
+        "http://localhost:3000,http://localhost:8000,http://127.0.0.1:3000,http://127.0.0.1:8000,https://rag-starter-demo.onrender.com,https://rag-starter-kit.onrender.com,file://"
+    ).split(",")
 
     # MCP Server Configuration
     MCP_SERVER_CONFIG = {

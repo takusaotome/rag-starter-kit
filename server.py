@@ -10,7 +10,7 @@ import asyncio
 from pathlib import Path
 from typing import Dict, List, Any, AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -241,7 +241,7 @@ Please answer the question in English based on the following information.
             retriever = self.vector_store.as_retriever(
                 search_kwargs={"k": Config.RETRIEVAL_K}
             )
-            relevant_docs = retriever.get_relevant_documents(query)
+            relevant_docs = retriever.invoke(query)
             
             # Extract source information
             sources = []
@@ -294,7 +294,7 @@ Please answer the question in English based on the following information.
             retriever = self.vector_store.as_retriever(
                 search_kwargs={"k": Config.RETRIEVAL_K}
             )
-            relevant_docs = retriever.get_relevant_documents(query)
+            relevant_docs = retriever.invoke(query)
             
             # ソース情報を抽出
             for doc in relevant_docs:
@@ -407,9 +407,9 @@ app = FastAPI(
 # CORSミドルウェアを追加
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 本番環境では適切なオリジンを指定
+    allow_origins=Config.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -419,7 +419,7 @@ security = HTTPBearer()
 def create_access_token(data: dict) -> str:
     """Create access token"""
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(hours=24)
+    expire = datetime.now(timezone.utc) + timedelta(hours=24)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, Config.JWT_SECRET_KEY, algorithm=Config.JWT_ALGORITHM)
     return encoded_jwt
