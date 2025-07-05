@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 RAG Starter Kit Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#3B82F6',
+                        'primary-dark': '#2563EB',
+                        'secondary': '#10B981',
+                        'accent': '#F59E0B',
+                        'dark': '#1F2937',
+                        'light': '#F8FAFC'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .pulse-dot {
+            animation: pulse-dot 1s infinite;
+        }
+        .streaming-text {
+            border-right: 2px solid #3B82F6;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { border-color: #3B82F6; }
+            51%, 100% { border-color: transparent; }
+        }
+        
+        /* Markdown Styles */
+        .markdown-content {
+            line-height: 1.6;
+            color: #374151;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        .markdown-content h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1F2937;
+            border-bottom: 2px solid #E5E7EB;
+            padding-bottom: 0.5rem;
+        }
+        
+        .markdown-content h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            margin-top: 1.5rem;
+            color: #1F2937;
+        }
+        
+        .markdown-content h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+            color: #374151;
+        }
+        
+        .markdown-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .markdown-content ul, .markdown-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        .markdown-content li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .markdown-content blockquote {
+            border-left: 4px solid #3B82F6;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            background-color: #F8FAFC;
+            font-style: italic;
+        }
+        
+        .markdown-content code {
+            background-color: #F3F4F6;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.875rem;
+            color: #DC2626;
+        }
+        
+        .markdown-content pre {
+            background-color: #1F2937;
+            color: #F3F4F6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+        
+        .markdown-content pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        .markdown-content strong {
+            font-weight: 600;
+            color: #1F2937;
+        }
+        
+        .markdown-content em {
+            font-style: italic;
+        }
+        
+        .markdown-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .markdown-content th, .markdown-content td {
+            border: 1px solid #D1D5DB;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        
+        .markdown-content th {
+            background-color: #F9FAFB;
+            font-weight: 600;
+        }
+        
+        .markdown-content a {
+            color: #3B82F6;
+            text-decoration: underline;
+        }
+        
+        .markdown-content a:hover {
+            color: #2563EB;
+        }
+        
+        .markdown-content hr {
+            border: none;
+            border-top: 1px solid #E5E7EB;
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                🚀 RAG Starter Kit Demo
+            </h1>
+            <p class="text-gray-600 text-lg">
+                Intelligent Question Answering with Real-time Streaming
+            </p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="space-y-6">
+            <!-- Authentication Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        🔐
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">Authentication</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <input type="text" id="username" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                               placeholder="Enter username" value="admin">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="password" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                               placeholder="Enter password" value="test123">
+                    </div>
+                    <div>
+                        <button onclick="login()" 
+                                class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
+                            <span id="loginText">🔑 Login</span>
+                            <div id="loginSpinner" class="hidden ml-2">
+                                <div class="flex space-x-1">
+                                    <div class="w-1 h-1 bg-white rounded-full pulse-dot"></div>
+                                    <div class="w-1 h-1 bg-white rounded-full pulse-dot" style="animation-delay: 0.2s;"></div>
+                                    <div class="w-1 h-1 bg-white rounded-full pulse-dot" style="animation-delay: 0.4s;"></div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="loginMessage" class="mt-4 text-center text-sm"></div>
+            </div>
+
+            <!-- Question Input Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                        💬
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">Ask Your Question</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Your Question</label>
+                        <textarea id="question" 
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors resize-vertical"
+                                  placeholder="Ask about Japanese cooking, recipes, or techniques... (Enter to submit, Shift+Enter for new line)" 
+                                  rows="3"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">
+                            💡 Tip: Press <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Enter</kbd> to submit, <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Shift</kbd> + <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Enter</kbd> for new line
+                        </p>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex space-x-2">
+                            <button onclick="setSampleQuestion('親子丼の作り方を教えて')" 
+                                    class="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-full hover:bg-blue-100 transition-colors">
+                                🍳 親子丼の作り方
+                            </button>
+                            <button onclick="setSampleQuestion('What is the best way to make sushi rice?')" 
+                                    class="text-sm bg-green-50 text-green-600 px-3 py-1 rounded-full hover:bg-green-100 transition-colors">
+                                🍣 Sushi Rice
+                            </button>
+                            <button onclick="setSampleQuestion('日本の調味料について教えて')" 
+                                    class="text-sm bg-purple-50 text-purple-600 px-3 py-1 rounded-full hover:bg-purple-100 transition-colors">
+                                🥄 調味料
+                            </button>
+                        </div>
+                        
+                        <button onclick="askQuestion()" 
+                                class="bg-secondary hover:bg-green-600 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 flex items-center">
+                            <span id="askText">🚀 Ask</span>
+                            <div id="askSpinner" class="hidden ml-2">
+                                <div class="flex space-x-1">
+                                    <div class="w-1 h-1 bg-white rounded-full pulse-dot"></div>
+                                    <div class="w-1 h-1 bg-white rounded-full pulse-dot" style="animation-delay: 0.2s;"></div>
+                                    <div class="w-1 h-1 bg-white rounded-full pulse-dot" style="animation-delay: 0.4s;"></div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Answer Display Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
+                        🤖
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">Answer</h2>
+                </div>
+                
+                <div id="answerContainer" class="min-h-[100px] p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div id="emptyState" class="text-center text-gray-500 py-8">
+                        <div class="text-4xl mb-2">🍜</div>
+                        <p>Ask a question about Japanese cooking to get started!</p>
+                    </div>
+                    
+                    <div id="answerContent" class="hidden">
+                        <div id="streamingAnswer" class="markdown-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-12 text-gray-600">
+            <p>🚀 Built with <strong>RAG Starter Kit</strong> - Powered by OpenAI GPT-4 & LangChain</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configure marked.js for better security and appearance
+        marked.setOptions({
+            breaks: true,        // Convert \n to <br>
+            gfm: true,          // GitHub Flavored Markdown
+            headerIds: false,   // Don't generate header IDs for security
+            sanitize: false,    // We trust our own LLM content
+            silent: true        // Don't throw on parsing errors
+        });
+
+        // Server Configuration - Environment variable placeholder
+        const serverUrl = 'http://localhost:8000';
+        
+        let authToken = null;
+        let isStreaming = false;
+        
+        // Set sample question
+        function setSampleQuestion(question) {
+            document.getElementById('question').value = question;
+        }
+        
+        // Login function
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginText = document.getElementById('loginText');
+            const loginSpinner = document.getElementById('loginSpinner');
+            const loginMessage = document.getElementById('loginMessage');
+            
+            if (!username || !password) {
+                showMessage('loginMessage', 'Please enter both username and password', 'error');
+                return;
+            }
+            
+            // Show loading state
+            loginText.textContent = '🔐 Logging in...';
+            loginSpinner.classList.remove('hidden');
+            
+            try {
+                const response = await fetch(`${serverUrl}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.access_token;
+                    showMessage('loginMessage', '✅ Login successful! You can now ask questions.', 'success');
+                    loginText.textContent = '✅ Logged In';
+                } else {
+                    showMessage('loginMessage', `❌ Login failed: ${data.detail || 'Invalid credentials'}`, 'error');
+                    loginText.textContent = '🔑 Login';
+                }
+            } catch (error) {
+                showMessage('loginMessage', `❌ Network error: ${error.message}`, 'error');
+                loginText.textContent = '🔑 Login';
+            } finally {
+                loginSpinner.classList.add('hidden');
+            }
+        }
+        
+        // Ask question function
+        async function askQuestion() {
+            const question = document.getElementById('question').value.trim();
+            const askText = document.getElementById('askText');
+            const askSpinner = document.getElementById('askSpinner');
+            
+            if (!question) {
+                alert('Please enter a question');
+                return;
+            }
+            
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            if (isStreaming) {
+                return;
+            }
+            
+            // Show loading state
+            isStreaming = true;
+            askText.textContent = '🔄 Asking...';
+            askSpinner.classList.remove('hidden');
+            
+            // Prepare answer display
+            const emptyState = document.getElementById('emptyState');
+            const answerContent = document.getElementById('answerContent');
+            const streamingAnswer = document.getElementById('streamingAnswer');
+            
+            emptyState.classList.add('hidden');
+            answerContent.classList.remove('hidden');
+            streamingAnswer.innerHTML = '';
+            
+            try {
+                const response = await fetch(`${serverUrl}/query/stream`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ query: question })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let accumulatedText = '';
+                let isFirstToken = true;
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // Keep the last incomplete line
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') {
+                                break;
+                            }
+                            
+                            try {
+                                const json = JSON.parse(data);
+                                if (json.type === 'token') {
+                                    if (isFirstToken) {
+                                        streamingAnswer.innerHTML = '';
+                                        accumulatedText = '';
+                                        isFirstToken = false;
+                                    }
+                                    
+                                    // Accumulate the text
+                                    accumulatedText += json.content;
+                                    
+                                    // Convert to markdown and display
+                                    try {
+                                        const markdownHtml = marked.parse(accumulatedText);
+                                        streamingAnswer.innerHTML = markdownHtml;
+                                    } catch (markdownError) {
+                                        // Fallback to plain text if markdown parsing fails
+                                        streamingAnswer.textContent = accumulatedText;
+                                    }
+                                    
+                                    streamingAnswer.scrollTop = streamingAnswer.scrollHeight;
+                                } else if (json.type === 'answer') {
+                                    // Final answer - ensure markdown conversion
+                                    try {
+                                        const markdownHtml = marked.parse(json.content);
+                                        streamingAnswer.innerHTML = markdownHtml;
+                                    } catch (markdownError) {
+                                        streamingAnswer.textContent = json.content;
+                                    }
+                                } else if (json.type === 'complete') {
+                                    // Final markdown conversion on completion
+                                    try {
+                                        const finalMarkdownHtml = marked.parse(accumulatedText);
+                                        streamingAnswer.innerHTML = finalMarkdownHtml;
+                                    } catch (markdownError) {
+                                        streamingAnswer.textContent = accumulatedText;
+                                    }
+                                }
+                            } catch (e) {
+                                // Skip invalid JSON
+                            }
+                        }
+                    }
+                }
+                
+                // Final markdown conversion if we have accumulated text
+                if (accumulatedText) {
+                    try {
+                        const finalMarkdownHtml = marked.parse(accumulatedText);
+                        streamingAnswer.innerHTML = finalMarkdownHtml;
+                    } catch (markdownError) {
+                        streamingAnswer.textContent = accumulatedText;
+                    }
+                }
+                
+            } catch (error) {
+                streamingAnswer.innerHTML = `<div class="text-red-600 bg-red-50 p-4 rounded-lg">❌ Error: ${error.message}</div>`;
+            } finally {
+                isStreaming = false;
+                askText.textContent = '🚀 Ask';
+                askSpinner.classList.add('hidden');
+            }
+        }
+        
+        // Keyboard shortcut handler
+        function handleKeyboardShortcut(event) {
+            // Check for Enter key
+            if (event.key === 'Enter') {
+                // Ignore Enter key during IME composition (Japanese input conversion)
+                if (event.isComposing || event.keyCode === 229) {
+                    return;
+                }
+                
+                // Only trigger if focus is on the question textarea
+                if (event.target.id === 'question' && !event.shiftKey) {
+                    event.preventDefault(); // Prevent default Enter behavior (new line)
+                    
+                    // Only submit if not already streaming
+                    if (!isStreaming) {
+                        askQuestion();
+                    }
+                }
+            }
+        }
+
+        // Helper function to show messages
+        function showMessage(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `mt-4 text-center text-sm ${type === 'error' ? 'text-red-600' : type === 'success' ? 'text-green-600' : 'text-blue-600'}`;
+        }
+        
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add IME-aware keyboard shortcut to question textarea
+            document.getElementById('question').addEventListener('keydown', handleKeyboardShortcut);
+        });
+        
+        // Auto-login on page load for demo purposes
+        window.onload = function() {
+            // Uncomment the following line to auto-login
+            // setTimeout(login, 1000);
+        };
+    </script>
+</body>
+</html> 

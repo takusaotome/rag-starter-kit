@@ -19,9 +19,6 @@ claude_desktop_config_production.json
 *_config_with_key*.json
 mcp_config_*.json
 
-# Generated files / 生成ファイル
-RAG_demo.html
-
 # Python
 __pycache__/
 *.py[cod]
