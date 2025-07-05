@@ -12,7 +12,7 @@ from typing import Dict, List, Any, AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Depends, status, Form
+from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -512,16 +512,22 @@ async def query_stream_endpoint(
         )
 
 
+class LoginRequest(BaseModel):
+    """Login request model"""
+    username: str
+    password: str
+
+
 @app.post("/login")
-async def login(username: str = Form(...), password: str = Form(...)):
+async def login(request: LoginRequest):
     """Login endpoint (authentication via environment variables)"""
     # Get authentication information from environment variables
     valid_username = os.getenv("DEMO_USERNAME", "admin")
-    valid_password = os.getenv("DEMO_PASSWORD", "change-this-password")
+    valid_password = os.getenv("DEMO_PASSWORD", "test123")
     
-    if username == valid_username and password == valid_password:
+    if request.username == valid_username and request.password == valid_password:
         access_token = create_access_token(
-            data={"sub": username, "user_id": username}
+            data={"sub": request.username, "user_id": request.username}
         )
         return {"access_token": access_token, "token_type": "bearer"}
     else:

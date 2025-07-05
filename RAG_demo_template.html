@@ -390,7 +390,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${authToken}`
                     },
-                    body: JSON.stringify({ question })
+                    body: JSON.stringify({ query: question })
                 });
                 
                 if (!response.ok) {
