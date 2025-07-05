@@ -4,28 +4,38 @@
 
 > 「孫よ、今日はおばあちゃんの秘密のレシピを教えてあげるわ。でも、これは料理のレシピじゃないの。AIのレシピよ。」
 
+## 🎯 この記事で学べること
+
+- ✅ RAG（検索拡張生成）の基本概念と仕組み
+- ✅ 実際に動作するRAGシステムの構築方法
+- ✅ LangChain + FastAPI + OpenAIを使った実装
+- ✅ 自分だけの知識ベースをカスタマイズする方法
+- ✅ トラブルシューティングと本格運用のノウハウ
+
 ## 📖 目次
 
 ### 🚀 クイックスタート（10分コース）
-1. [環境構築](#第2章：材料を準備しよう---開発環境構築) → 2分
-2. [ベクトルストア作成](#第4章：記憶の魔法---ベクトルストアの秘密) → 3分
-3. [サーバー起動](#第7章：魔法の完成---動作確認とカスタマイズ) → 2分
-4. [動作確認](#第7章：魔法の完成---動作確認とカスタマイズ) → 3分
+1. [環境構築](#chapter2) → 2分
+2. [ベクトルストア作成](#chapter4) → 3分
+3. [サーバー起動](#chapter7) → 2分
+4. [動作確認](#chapter7) → 3分
 
 ### 📚 詳細学習
-1. [プロローグ：AIおばあちゃんとの出会い](#プロローグ：AIおばあちゃんとの出会い)
-2. [第1章：RAGって何？不思議な技術の正体](#第1章：RAGって何？不思議な技術の正体)
-3. [第2章：材料を準備しよう - 開発環境構築](#第2章：材料を準備しよう---開発環境構築)
-4. [第3章：知識の種をまく - 知識ベースの構築](#第3章：知識の種をまく---知識ベースの構築)
-5. [第4章：記憶の魔法 - ベクトルストアの秘密](#第4章：記憶の魔法---ベクトルストアの秘密)
-6. [第5章：会話の心臓 - APIサーバーの実装](#第5章：会話の心臓---APIサーバーの実装)
-7. [第6章：美しい顔 - フロントエンドの作成](#第6章：美しい顔---フロントエンドの作成)
-8. [第7章：魔法の完成 - 動作確認とカスタマイズ](#第7章：魔法の完成---動作確認とカスタマイズ)
-9. [エピローグ：あなたの番です](#エピローグ：あなたの番です)
+1. [プロローグ：AIおばあちゃんとの出会い](#prologue)
+2. [第1章：RAGって何？不思議な技術の正体](#chapter1)
+3. [第2章：材料を準備しよう - 開発環境構築](#chapter2)
+4. [第3章：知識の種をまく - 知識ベースの構築](#chapter3)
+5. [第4章：記憶の魔法 - ベクトルストアの秘密](#chapter4)
+6. [第5章：会話の心臓 - APIサーバーの実装](#chapter5)
+7. [第6章：美しい顔 - フロントエンドの作成](#chapter6)
+8. [第7章：魔法の完成 - 動作確認とカスタマイズ](#chapter7)
+9. [第8章：実践的な活用例](#chapter8)
+10. [第9章：トラブルシューティング](#chapter9)
+11. [エピローグ：あなたの番です](#epilogue)
 
 ---
 
-## プロローグ：AIおばあちゃんとの出会い
+## プロローグ：AIおばあちゃんとの出会い {#prologue}
 
 田中太郎（仮名）は、プログラミングを学び始めたばかりの大学生。「最近AIがすごいって聞くけど、自分でも作れるのかな？」と思っていた矢先、友人から不思議な話を聞いた。
 
@@ -42,7 +52,7 @@ cd rag-starter-kit
 
 ---
 
-## 第1章：RAGって何？不思議な技術の正体
+## 第1章：RAGって何？不思議な技術の正体 {#chapter1}
 
 ### 🤖 AIおばあちゃんが教える「RAGの基本」
 
@@ -86,9 +96,16 @@ graph TD
 
 「つまり、RAGはAIに『専門的な記憶』を持たせる技術なのよ。おばあちゃんの料理レシピを覚えさせれば、料理の専門家になれるの！」
 
+### 💡 なぜRAGが重要なのか？
+
+1. **最新情報への対応** - 学習データに含まれない情報も扱える
+2. **専門知識の活用** - 特定分野の深い知識を持たせられる
+3. **情報の信頼性** - 参照元が明確で検証可能
+4. **カスタマイズ性** - 組織や個人の知識ベースを活用
+
 ---
 
-## 第2章：材料を準備しよう - 開発環境構築
+## 第2章：材料を準備しよう - 開発環境構築 {#chapter2}
 
 ### 🛠️ 必要な材料（技術スタック）
 
@@ -144,10 +161,11 @@ echo $OPENAI_API_KEY | head -c 10 && echo "... ✅ API Key OK"
 
 - **仮想環境って何？**: 料理で例えると「専用の調理場」。他のプロジェクトと材料が混ざらないように隔離する技術
 - **API Keyって？**: OpenAIのサービスを使うための「入場券」。[OpenAI公式サイト](https://openai.com/)で取得可能
+- **エラーが出た場合**: [トラブルシューティング](#第9章：トラブルシューティング)を参照
 
 ---
 
-## 第3章：知識の種をまく - 知識ベースの構築
+## 第3章：知識の種をまく - 知識ベースの構築 {#chapter3}
 
 ### 📚 おばあちゃんの知識ベース
 
@@ -233,7 +251,7 @@ def greet(name):
 
 ---
 
-## 第4章：記憶の魔法 - ベクトルストアの秘密
+## 第4章：記憶の魔法 - ベクトルストアの秘密 {#chapter4}
 
 ### 🧠 AIの記憶の仕組み
 
@@ -310,29 +328,177 @@ def process_documents():
 
 ---
 
-## 第5章：会話の心臓 - APIサーバーの実装
+## 第5章：会話の心臓 - APIサーバーの実装 {#chapter5}
 
-### 🚀 FastAPIサーバーの構造
+「太郎くん、いよいよAIおばあちゃんの心臓部分を作っていきましょう」
+
+太郎は少し緊張した。「サーバーって聞くと難しそう...」
+
+「大丈夫よ。レストランで例えると、お客さん（フロントエンド）から注文（質問）を受けて、シェフ（AI）に伝えて、料理（回答）を運ぶウェイター（APIサーバー）のようなものよ」
+
+### 📚 初学者のための基礎知識
+
+#### 🤔 「APIサーバー」って何？
+
+**API**とは「Application Programming Interface」の略で、簡単に言うと「プログラム同士の会話のルール」です。
+
+```
+👤 ユーザー → 🌐 Webページ → 📡 APIサーバー → 🤖 AI → 💬 回答
+```
+
+**身近な例で理解しよう：**
+- **レストランの注文システム**: お客さん→ウェイター→キッチン→料理→お客さん
+- **銀行のATM**: あなた→ATM画面→銀行システム→残高情報→ATM画面
+- **AIおばあちゃん**: あなた→Webページ→APIサーバー→AI→回答→Webページ
+
+#### 🔧 「FastAPI」を選ぶ理由
+
+**FastAPI**は、Pythonで作られたWebサーバーフレームワークです。
 
 ```python
-# server.py の主要部分
-from fastapi import FastAPI, HTTPException, Depends
-from langchain.chains import RetrievalQA
-from langchain_openai import ChatOpenAI
+# 他のフレームワークとの比較（初心者向け）
+
+# Flask（シンプルだが機能が少ない）
+@app.route('/hello')
+def hello():
+    return "Hello World"
+
+# Django（多機能だが複雑）
+# 設定ファイル多数、学習コストが高い
+
+# FastAPI（ちょうどいい！）
+@app.get("/hello")
+async def hello():
+    return {"message": "Hello World"}
+```
+
+**FastAPIの魅力：**
+- 📝 **自動ドキュメント生成** → コードを書くだけでAPI説明書ができる
+- ⚡ **高速** → PythonのWebフレームワークの中で最速クラス
+- 🔒 **型チェック** → バグを事前に発見できる
+- 📱 **簡単** → 少ないコードで多機能を実現
+
+### 🚀 FastAPIサーバーの構造解説
+
+#### 🔍 全体の設計図を理解しよう
+
+```python
+# server.py の主要部分（初学者向け詳細解説）
+
+# 📦 必要なライブラリをインポート
+from fastapi import FastAPI, HTTPException, Depends  # Webサーバー機能
+from langchain.chains import RetrievalQA             # RAG処理の中核
+from langchain_openai import ChatOpenAI              # OpenAI GPTとの接続
 
 class RAGServer:
+    """
+    🧠 AIおばあちゃんの脳みそクラス
+    
+    このクラスが行うこと：
+    - 質問を受け取る
+    - 関連する料理レシピを探す
+    - AIに質問と情報を渡す
+    - 回答を整形して返す
+    """
+    
     def __init__(self):
-        self.vector_store = None
-        self.qa_chain = None
-        self.embeddings = OpenAIEmbeddings()
+        """🎯 初期化：AIおばあちゃんの準備をする"""
+        self.vector_store = None      # 📚 レシピの記憶庫（後で設定）
+        self.qa_chain = None          # 🔗 質問→回答の処理チェーン
+        self.embeddings = OpenAIEmbeddings()  # 🔢 文章をベクトルに変換する道具
     
     def process_query(self, query: str):
-        # 1. 質問を受け取る
-        # 2. 関連情報を検索
-        # 3. LLMで回答生成
-        # 4. 結果を返す
-        pass
+        """
+        🍳 メインの料理メソッド：質問から回答を作る
+        
+        【処理の流れ（料理に例えると）】
+        1. 何語で話しているか確認（客の言語チェック）
+        2. 材料を探す（レシピデータベース検索）
+        3. 材料を整理（情報をまとめる）
+        4. 調理方法を決める（プロンプト作成）
+        5. 料理する（AI推論）
+        6. 盛り付け（回答の整形）
+        """
+        try:
+            # 🌍 ステップ1: この質問は日本語？英語？
+            language = self.detect_language(query)
+            # 📝 ログに記録（デバッグ時に便利）
+            logging.info(f"検出言語: {language} | 質問: {query[:50]}...")
+            
+            # 🔍 ステップ2: 関連するレシピ情報を探索
+            # 例：「親子丼」→ 親子丼レシピ、鶏肉料理、卵料理などを検索
+            relevant_docs = self.vector_store.similarity_search(
+                query,           # 検索クエリ（ユーザーの質問）
+                k=4             # 上位4件だけ取得（多すぎると混乱する）
+            )
+            logging.info(f"関連文書数: {len(relevant_docs)}")
+            
+            # 📋 ステップ3: 見つけた情報をまとめる
+            # 複数のレシピ情報を1つの文章に結合
+            context = "\n\n".join([doc.page_content for doc in relevant_docs])
+            
+            # 🎯 ステップ4: AIへの指示書（プロンプト）を作成
+            # 質問の種類に応じて最適な指示を選択
+            prompt_template = self.get_dynamic_prompt_template(query)
+            final_prompt = prompt_template.format(
+                context=context,     # 見つけたレシピ情報
+                question=query       # ユーザーの質問
+            )
+            
+            # 🤖 ステップ5: AIに推論してもらう
+            # LangChainが質問と情報をGPTに送って回答をもらう
+            response = self.qa_chain.run({
+                "input_documents": relevant_docs,  # 参考文書
+                "question": query                  # 質問
+            })
+            
+            # ✨ ステップ6: 回答を読みやすく整形
+            # 言語に応じて敬語や絵文字を追加
+            formatted_response = self.format_response(response, language)
+            
+            # 📊 処理完了をログに記録
+            logging.info(f"回答生成完了: {len(formatted_response)}文字")
+            return formatted_response
+            
+        except Exception as e:
+            # 🚨 エラーが発生した場合の対処
+            logging.error(f"クエリ処理エラー: {str(e)}")
+            return self.get_error_response(language)
 ```
+
+#### 💡 初学者向け：このコードの重要ポイント
+
+**🤔 なぜ`try-except`を使うの？**
+```python
+try:
+    # 普通の処理
+    result = process_something()
+except Exception as e:
+    # エラーが起きた時の処理
+    return "エラーが発生しました"
+```
+プログラムは時々失敗します（ネットワークエラー、API制限など）。`try-except`は「もしエラーが起きても、プログラムを止めずに適切に対処する」ための仕組みです。
+
+**🔍 `similarity_search`の魔法**
+```python
+# ユーザーが「親子丼の作り方」と質問すると...
+query = "親子丼の作り方"
+
+# AIが自動で関連情報を見つけてくれる
+results = [
+    "親子丼のレシピ情報",      # 最も関連度が高い
+    "鶏肉の調理法",           # 2番目
+    "卵の調理法",             # 3番目
+    "どんぶり料理の基本"      # 4番目
+]
+```
+
+**📝 `logging`でデバッグ**
+```python
+logging.info("何が起こっているかを記録")
+# → 2024-01-15 10:30:15 - INFO - 何が起こっているかを記録
+```
+これは「プログラムの日記」のようなもの。何が起こったかを記録して、問題が起きた時に原因を探せます。
 
 ### 🔍 言語検出の魔法
 
@@ -371,28 +537,219 @@ async def process_query_streaming(self, query: str):
         yield f"data: {json.dumps({'text': chunk.get('result', '')})}\n\n"
 ```
 
+### 🧠 動的プロンプト生成の仕組み
+
+```python
+def get_dynamic_prompt_template(self, query: str) -> str:
+    """
+    質問の内容に応じて最適なプロンプトテンプレートを選択
+    """
+    # 料理関連のキーワード検出
+    cooking_keywords = ['作り方', '材料', 'レシピ', 'how to make', 'ingredients']
+    
+    if any(keyword in query.lower() for keyword in cooking_keywords):
+        return """
+あなたは料理の専門家です。以下のレシピ情報を参考に、具体的で実用的な回答をしてください。
+
+レシピ情報:
+{context}
+
+質問: {question}
+
+回答は以下の形式で：
+📋 材料
+👩‍🍳 作り方
+💡 コツ・ポイント
+"""
+    else:
+        return """
+以下の情報を参考に、質問に正確に答えてください：
+
+参考情報:
+{context}
+
+質問: {question}
+"""
+
+def format_response(self, response: str, language: str) -> str:
+    """
+    回答を言語と形式に応じて整形
+    """
+    if language == 'japanese':
+        # 日本語の場合、敬語や絵文字を追加
+        if not response.startswith('申し訳'):
+            response = f"🍜 おばあちゃんからのアドバイス\n\n{response}"
+    
+    return response
+
+def get_error_response(self, language: str) -> str:
+    """
+    エラー時の適切なレスポンス
+    """
+    if language == 'japanese':
+        return "申し訳ございません。少し調子が悪いようです。もう一度お試しください。"
+    else:
+        return "I'm sorry, something went wrong. Please try again."
+```
+
 ### 🔐 認証システム
 
 ```python
-# JWT認証
-def create_access_token(data: dict) -> str:
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(hours=24)
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, Config.JWT_SECRET_KEY, algorithm="HS256")
+# JWT認証の完全実装
+class AuthManager:
+    def __init__(self):
+        self.secret_key = Config.JWT_SECRET_KEY
+        self.algorithm = "HS256"
+        self.access_token_expire = timedelta(hours=24)
+    
+    def create_access_token(self, data: dict) -> str:
+        """アクセストークンを生成"""
+        to_encode = data.copy()
+        expire = datetime.utcnow() + self.access_token_expire
+        to_encode.update({"exp": expire})
+        
+        try:
+            token = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
+            logging.info(f"トークン生成成功: ユーザー {data.get('sub', 'unknown')}")
+            return token
+        except Exception as e:
+            logging.error(f"トークン生成エラー: {str(e)}")
+            raise HTTPException(status_code=500, detail="トークン生成に失敗しました")
+    
+    def verify_token(self, token: str) -> dict:
+        """トークンを検証してペイロードを返す"""
+        try:
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            username: str = payload.get("sub")
+            if username is None:
+                raise HTTPException(status_code=401, detail="無効なトークンです")
+            return payload
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail="トークンが期限切れです")
+        except jwt.JWTError:
+            raise HTTPException(status_code=401, detail="トークンが無効です")
+
+# 依存性注入でトークン検証
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    """現在のユーザーを取得"""
+    auth_manager = AuthManager()
+    return auth_manager.verify_token(token)
+```
+
+### 📊 ログ出力とモニタリング
+
+```python
+import logging
+from datetime import datetime
+
+# 詳細なログ設定
+def setup_logging():
+    """ログ設定の初期化"""
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler('rag_server.log'),
+            logging.StreamHandler()
+        ]
+    )
+
+class QueryLogger:
+    """クエリ処理のログを詳細に記録"""
+    
+    @staticmethod
+    def log_query_start(query: str, user_id: str = None):
+        logging.info(f"🔍 クエリ開始 | ユーザー: {user_id} | 質問: {query[:100]}...")
+    
+    @staticmethod
+    def log_vector_search(query: str, results_count: int, search_time: float):
+        logging.info(f"🔍 ベクトル検索完了 | 結果数: {results_count} | 検索時間: {search_time:.2f}秒")
+    
+    @staticmethod
+    def log_llm_response(response_length: int, processing_time: float):
+        logging.info(f"🤖 LLM応答完了 | 文字数: {response_length} | 処理時間: {processing_time:.2f}秒")
+    
+    @staticmethod
+    def log_error(error: str, query: str):
+        logging.error(f"❌ エラー発生 | 質問: {query[:50]} | エラー: {error}")
 ```
 
 ---
 
-## 第6章：美しい顔 - フロントエンドの作成
+## 第6章：美しい顔 - フロントエンドの作成 {#chapter6}
 
-### 🎨 Tailwind CSSで美しいUI
+「太郎くん、今度はAIおばあちゃんの顔を作りましょう」
+
+太郎は首をかしげた。「顔？」
+
+「そう、フロントエンドよ。ユーザーが実際に見て触る部分。美しくて使いやすいインターフェースを作るの。料理で言うと『盛り付け』ね」
+
+### 📚 初学者のための基礎知識
+
+#### 🤔 「フロントエンド」って何？
+
+**フロントエンド**とは、ユーザーが直接見て操作する部分のことです。
+
+```
+🖥️ フロントエンド（見える部分）
+├── HTML → 骨格（建物の構造）
+├── CSS  → 見た目（インテリア装飾）
+└── JavaScript → 動き（電気設備）
+
+📡 バックエンド（見えない部分）
+├── サーバー → 脳みそ（処理をする）
+├── データベース → 記憶（情報を保存）
+└── API → 橋渡し（やり取りの仕組み）
+```
+
+**身近な例で理解：**
+- **レストラン**: 客席（フロント）← → 厨房（バック）
+- **銀行**: ATM画面（フロント）← → 銀行システム（バック）
+- **スマホアプリ**: アプリ画面（フロント）← → サーバー（バック）
+
+#### 🎨 「Tailwind CSS」を選ぶ理由
+
+**CSS**は見た目を作る言語ですが、**Tailwind CSS**はより簡単にきれいなデザインを作れるツールです。
 
 ```html
-<!-- RAG_demo.html の抜粋 -->
+<!-- 普通のCSS（面倒） -->
+<style>
+.button {
+    background-color: blue;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+}
+</style>
+<button class="button">クリック</button>
+
+<!-- Tailwind CSS（簡単！） -->
+<button class="bg-blue-500 text-white px-5 py-2 rounded border-none">
+    クリック
+</button>
+```
+
+**Tailwindの魅力：**
+- 🚀 **書きやすい** → HTMLに直接スタイルを書ける
+- 🎨 **美しい** → プロ並みのデザインが簡単に
+- 📱 **レスポンシブ** → スマホ・タブレット対応が楽
+- ⚡ **高速** → 必要な部分だけを読み込む
+
+### 🎨 Tailwind CSSで美しいUI作り
+
+#### 🏗️ 基本構造の理解
+
+```html
+<!-- RAG_demo.html の抜粋（初学者向け解説付き） -->
+
+<!-- 🏠 メインコンテナ：ページ全体の背景を作る -->
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <!-- 📏 コンテンツ幅制限：中央寄せで読みやすくする -->
     <div class="max-w-4xl mx-auto p-6">
+        <!-- 💳 カード風デザイン：内容をきれいにまとめる -->
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <!-- 🎨 ヘッダー部分：グラデーション背景で目立たせる -->
             <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-6">
                 <h1 class="text-3xl font-bold text-white">
                     🍜 RAG Starter Kit Demo
@@ -403,159 +760,649 @@ def create_access_token(data: dict) -> str:
 </div>
 ```
 
-### ⌨️ キーボードショートカット
+#### 💡 Tailwind CSSクラス名の意味解説
+
+**🏠 レイアウト関連**
+```css
+min-h-screen    → 最小高さを画面全体に（スマホでも縦いっぱい）
+max-w-4xl      → 最大幅を制限（読みやすい幅にする）
+mx-auto        → 左右中央寄せ（m=margin, x=水平, auto=自動）
+p-6            → 内側の余白を6単位（p=padding）
+```
+
+**🎨 見た目関連**
+```css
+bg-white                    → 背景色を白に
+bg-gradient-to-br          → 右下向きのグラデーション
+from-blue-50 to-indigo-100 → 薄い青から薄い紫へ
+rounded-2xl                → 角を大きく丸く
+shadow-xl                  → 大きな影をつける
+```
+
+**📝 文字関連**
+```css
+text-3xl       → 文字サイズを大きく（3XLサイズ）
+font-bold      → 文字を太く
+text-white     → 文字色を白に
+```
+
+### ⌨️ キーボードショートカットの魔法
+
+#### 🎯 なぜキーボードショートカットが重要？
+
+ユーザーは「マウスでボタンを押す」より「キーボードで素早く操作」を好みます。
 
 ```javascript
-// Cmd+Enter / Ctrl+Enter でクエリ実行
+// 🚀 Cmd+Enter / Ctrl+Enter でクエリ実行（初学者向け解説）
+
 document.addEventListener('keydown', function(e) {
+    // 🔍 解説：「キーが押された時」を監視
+    
+    // Macでは「Cmd」、WindowsでSは「Ctrl」キーをチェック
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        // 🛑 ブラウザのデフォルト動作を停止
         e.preventDefault();
+        
+        // ボタンが無効でなければ送信実行
         if (!submitButton.disabled) {
-            submitQuery();
+            submitQuery();  // 質問送信関数を呼び出し
         }
     }
 });
 ```
 
-### 💫 リアルタイム応答表示
+#### 🤔 初学者が混乱しやすいポイント
+
+**❓ `e.metaKey`と`e.ctrlKey`って何？**
+```javascript
+// OS別のキー対応
+if (isMac) {
+    // Macの場合：⌘ Command キー
+    console.log(e.metaKey);  // true/false
+} else {
+    // Windowsの場合：Ctrl キー  
+    console.log(e.ctrlKey);  // true/false
+}
+
+// 両方に対応する書き方
+if (e.metaKey || e.ctrlKey) {
+    console.log("特殊キーが押された！");
+}
+```
+
+**❓ `e.preventDefault()`って何をしてるの？**
+```javascript
+// preventDefault()がない場合
+// → ブラウザが「Enter」の標準動作（改行など）をしてしまう
+
+// preventDefault()がある場合  
+// → ブラウザの標準動作を無効化して、自分の処理だけ実行
+e.preventDefault();
+```
+
+**❓ なぜ`!submitButton.disabled`をチェック？**
+```javascript
+// 安全な処理の例
+if (!submitButton.disabled) {
+    // ボタンが「有効」な時だけ実行
+    submitQuery();
+} else {
+    // ボタンが「無効」な時は何もしない
+    // 例：既に送信中、入力が空、エラー状態など
+    console.log("送信できない状態です");
+}
+```
+
+### 💫 リアルタイム応答表示の詳細実装
+
+#### 🚀 完全なフロントエンド実装
+
+#### 🏗️ クラス設計の理解
+
+まず「クラス」について理解しましょう。
 
 ```javascript
-// Server-Sent Events でストリーミング
-const eventSource = new EventSource('/query/stream', {
-    method: 'POST',
-    headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+// 🏠 クラス = 設計図（家の設計図のようなもの）
+class RAGChatInterface {
+    // 🔧 constructor = 家を建てる時の初期工事
+    constructor() {
+        // 🔑 認証トークンを取得（ログイン情報）
+        this.token = localStorage.getItem('access_token');
+        
+        // 🚦 送信中かどうかのフラグ（信号機のようなもの）
+        this.isStreaming = false;
+        
+        // 🔌 サーバーとの接続管理（電話回線のようなもの）
+        this.currentEventSource = null;
+        
+        // 🎯 DOM要素を見つけて記憶
+        this.initializeElements();
+        
+        // 👂 イベントリスナーを設定（耳を澄ませる）
+        this.setupEventListeners();
     }
+```
+
+#### 🤔 初学者が疑問に思うポイント
+
+**❓ `this.`って何？**
+```javascript
+// クラス内での「自分自身」を指す代名詞
+class Person {
+    constructor(name) {
+        this.name = name;  // 「この人の名前」
+        this.age = 0;      // 「この人の年齢」
+    }
+    
+    introduce() {
+        // 「この人の名前」を使って自己紹介
+        console.log(`私の名前は${this.name}です`);
+    }
+}
+
+// 実際に使う時
+const taro = new Person("太郎");
+taro.introduce();  // "私の名前は太郎です"
+```
+
+**❓ `localStorage`って何？**
+```javascript
+// ブラウザの「メモ帳」のようなもの
+// ページを閉じても情報が残る
+
+// 保存
+localStorage.setItem('user_name', '太郎');
+
+// 取得  
+const name = localStorage.getItem('user_name');
+console.log(name);  // "太郎"
+
+// 削除
+localStorage.removeItem('user_name');
+```
+
+**❓ なぜ`initializeElements()`を分ける？**
+```javascript
+// ❌ 悪い例：全部constructorに書く
+constructor() {
+    this.button = document.getElementById('button');
+    this.input = document.getElementById('input');
+    this.output = document.getElementById('output');
+    // 長すぎて読みにくい...
+}
+
+// ✅ 良い例：機能ごとに分ける
+constructor() {
+    this.initializeElements();  // 要素の取得
+    this.setupEventListeners(); // イベントの設定
+    // すっきり！
+}
+
+initializeElements() {
+    // DOM要素取得だけに集中
+    this.button = document.getElementById('button');
+    this.input = document.getElementById('input');
+    this.output = document.getElementById('output');
+}
+```
+    
+    initializeElements() {
+        // DOM要素の取得
+        this.queryInput = document.getElementById('queryInput');
+        this.submitButton = document.getElementById('submitQuery');
+        this.responseDiv = document.getElementById('response');
+        this.loadingDiv = document.getElementById('loading');
+        this.typingIndicator = document.getElementById('typingIndicator');
+    }
+    
+    setupEventListeners() {
+        // 送信ボタンのイベント
+        this.submitButton.addEventListener('click', () => this.submitQuery());
+        
+        // Enter キーでの送信（Shift+Enterは改行）
+        this.queryInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.submitQuery();
+            }
+        });
+        
+        // Cmd/Ctrl + Enter でも送信可能
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (!this.submitButton.disabled) {
+                    this.submitQuery();
+                }
+            }
+        });
+        
+        // 入力中のリアルタイム検証
+        this.queryInput.addEventListener('input', () => {
+            this.validateInput();
+        });
+    }
+    
+    validateInput() {
+        const query = this.queryInput.value.trim();
+        this.submitButton.disabled = query.length === 0 || this.isStreaming;
+        
+        // 文字数カウンターの更新
+        const charCount = document.getElementById('charCount');
+        if (charCount) {
+            charCount.textContent = `${query.length}/500`;
+            charCount.className = query.length > 400 ? 'text-red-500' : 'text-gray-500';
+        }
+    }
+    
+    async submitQuery() {
+        const query = this.queryInput.value.trim();
+        if (!query || this.isStreaming) return;
+        
+        try {
+            // UI状態の更新
+            this.setLoadingState(true);
+            this.displayUserMessage(query);
+            this.queryInput.value = '';
+            
+            // ストリーミングレスポンスの開始
+            await this.streamResponse(query);
+            
+        } catch (error) {
+            this.handleError(error);
+        } finally {
+            this.setLoadingState(false);
+        }
+    }
+    
+    displayUserMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'mb-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500';
+        messageDiv.innerHTML = `
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl">🧑‍💻</span>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-blue-800">あなた</p>
+                    <p class="text-blue-700">${this.escapeHtml(message)}</p>
+                </div>
+            </div>
+        `;
+        this.responseDiv.appendChild(messageDiv);
+        this.scrollToBottom();
+    }
+    
+    async streamResponse(query) {
+        return new Promise((resolve, reject) => {
+            // 既存のEventSourceがあれば閉じる
+            if (this.currentEventSource) {
+                this.currentEventSource.close();
+            }
+            
+            // AIの応答エリアを作成
+            const aiResponseDiv = this.createAIResponseDiv();
+            const contentDiv = aiResponseDiv.querySelector('.ai-content');
+            
+            // EventSourceでストリーミング開始
+            const eventSource = new EventSource(
+                `/query/stream?query=${encodeURIComponent(query)}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${this.token}`
+                    }
+                }
+            );
+            
+            this.currentEventSource = eventSource;
+            
+            eventSource.onopen = () => {
+                console.log('🚀 ストリーミング開始');
+                this.showTypingIndicator();
+            };
+            
+            eventSource.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.type === 'content') {
+                        // テキストを追加（マークダウンレンダリング対応）
+                        contentDiv.innerHTML = this.renderMarkdown(data.text);
+                        this.scrollToBottom();
+                    } else if (data.type === 'error') {
+                        throw new Error(data.message);
+                    } else if (data.type === 'done') {
+                        // ストリーミング完了
+                        this.hideTypingIndicator();
+                        eventSource.close();
+                        resolve();
+                    }
+                } catch (error) {
+                    console.error('ストリーミングデータ解析エラー:', error);
+                    reject(error);
+                }
+            };
+            
+            eventSource.onerror = (error) => {
+                console.error('EventSource エラー:', error);
+                this.hideTypingIndicator();
+                eventSource.close();
+                reject(new Error('サーバーとの接続に問題が発生しました'));
+            };
+            
+            // タイムアウト設定（30秒）
+            setTimeout(() => {
+                if (eventSource.readyState === EventSource.OPEN) {
+                    eventSource.close();
+                    reject(new Error('応答がタイムアウトしました'));
+                }
+            }, 30000);
+        });
+    }
+    
+    createAIResponseDiv() {
+        const responseDiv = document.createElement('div');
+        responseDiv.className = 'mb-4 p-4 bg-green-50 rounded-lg border-l-4 border-green-500';
+        responseDiv.innerHTML = `
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl">🤖</span>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium text-green-800">AIおばあちゃん</p>
+                    <div class="ai-content text-green-700 prose prose-green max-w-none">
+                        <!-- ここにストリーミングコンテンツが入る -->
+                    </div>
+                </div>
+            </div>
+        `;
+        this.responseDiv.appendChild(responseDiv);
+        return responseDiv;
+    }
+    
+    renderMarkdown(text) {
+        // 簡単なマークダウンレンダリング
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **太字**
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')              // *イタリック*
+            .replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 rounded">$1</code>')  // `コード`
+            .replace(/\n/g, '<br>');                           // 改行
+    }
+    
+    showTypingIndicator() {
+        if (this.typingIndicator) {
+            this.typingIndicator.style.display = 'block';
+            this.typingIndicator.innerHTML = `
+                <div class="flex items-center space-x-2 text-gray-500">
+                    <div class="typing-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <span>AIおばあちゃんが考えています...</span>
+                </div>
+            `;
+        }
+    }
+    
+    hideTypingIndicator() {
+        if (this.typingIndicator) {
+            this.typingIndicator.style.display = 'none';
+        }
+    }
+    
+    setLoadingState(isLoading) {
+        this.isStreaming = isLoading;
+        this.submitButton.disabled = isLoading;
+        this.submitButton.textContent = isLoading ? '送信中...' : '送信';
+        this.validateInput();  // ボタン状態を再評価
+    }
+    
+    handleError(error) {
+        console.error('Error:', error);
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'mb-4 p-4 bg-red-50 rounded-lg border-l-4 border-red-500';
+        errorDiv.innerHTML = `
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl">⚠️</span>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-red-800">エラー</p>
+                    <p class="text-red-700">${this.escapeHtml(error.message)}</p>
+                    <button onclick="location.reload()" 
+                            class="mt-2 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                        ページを再読み込み
+                    </button>
+                </div>
+            </div>
+        `;
+        this.responseDiv.appendChild(errorDiv);
+        this.scrollToBottom();
+    }
+    
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    scrollToBottom() {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+}
+
+// ページ読み込み完了後に初期化
+document.addEventListener('DOMContentLoaded', () => {
+    window.ragChat = new RAGChatInterface();
+});
+```
+
+#### 🎨 タイピングアニメーションのCSS
+
+```css
+/* タイピングインジケーターのアニメーション */
+.typing-dots {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.typing-dots span {
+    height: 8px;
+    width: 8px;
+    background-color: #6b7280;
+    border-radius: 50%;
+    display: inline-block;
+    animation: typing-bounce 1.4s ease-in-out infinite both;
+}
+
+.typing-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes typing-bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .ai-content {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .typing-dots span {
+        height: 6px;
+        width: 6px;
+    }
+}
+```
+
+#### 🔄 バックエンドとの連携（server.py側）
+
+```python
+@app.get("/query/stream")
+async def stream_query(
+    query: str = Query(..., description="ユーザーの質問"),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    ストリーミング形式でRAG回答を生成
+    """
+    async def generate_stream():
+        try:
+            # ログ記録
+            QueryLogger.log_query_start(query, current_user.get('sub'))
+            
+            # ヘッダー送信
+            yield f"data: {json.dumps({'type': 'start', 'message': 'ストリーミング開始'})}\n\n"
+            
+            # RAG処理の実行（ストリーミング対応）
+            rag_server = RAGServer()
+            
+            accumulated_response = ""
+            async for chunk in rag_server.process_query_streaming(query):
+                accumulated_response += chunk
+                
+                # フロントエンドにチャンク送信
+                yield f"data: {json.dumps({'type': 'content', 'text': accumulated_response})}\n\n"
+                
+                # 少し待つ（自然なタイピング効果）
+                await asyncio.sleep(0.05)
+            
+            # 完了通知
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
+            
+        except Exception as e:
+            # エラー通知
+            error_message = f"申し訳ございません。エラーが発生しました: {str(e)}"
+            yield f"data: {json.dumps({'type': 'error', 'message': error_message})}\n\n"
+    
+    return StreamingResponse(
+        generate_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        }
+    )
+```
+
+#### 🚨 初学者がつまずきやすいポイント
+
+**🔍 問題1: 「Server-Sent Eventsって何？」**
+
+```javascript
+// 🤔 普通のHTTP通信（一回きり）
+fetch('/api/question', {
+    method: 'POST',
+    body: JSON.stringify({question: '親子丼の作り方'})
+})
+.then(response => response.json())
+.then(data => {
+    console.log(data.answer);  // 回答が一気に表示
 });
 
-eventSource.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    responseDiv.innerHTML += data.text;
+// ✨ Server-Sent Events（リアルタイム）
+const eventSource = new EventSource('/api/stream');
+eventSource.onmessage = (event) => {
+    const chunk = event.data;
+    console.log(chunk);  // 文字が少しずつ流れてくる
 };
+```
+
+**📱 問題2: 「非同期処理が分からない」**
+
+```javascript
+// ❌ 同期処理（待機してしまう）
+function badExample() {
+    console.log("1. 処理開始");
+    
+    // この処理が終わるまで次に進まない（ブラウザが固まる）
+    const result = heavyProcessing();  // 3秒かかる処理
+    
+    console.log("2. 処理完了");
+    console.log(result);
+}
+
+// ✅ 非同期処理（他の作業も並行）
+async function goodExample() {
+    console.log("1. 処理開始");
+    
+    // この処理は「別のスレッド」で実行（ブラウザは固まらない）
+    const result = await heavyProcessingAsync();  // 3秒かかる処理
+    
+    console.log("2. 処理完了");
+    console.log(result);
+}
+```
+
+#### 🎯 実際の動作イメージ
+
+**Step 1: ユーザーが質問を入力**
+```
+👤 ユーザー: "親子丼の作り方を教えて"
+📝 入力フィールド: [親子丼の作り方を教えて]
+🔘 送信ボタン: [送信] ← クリック
+```
+
+**Step 2: フロントエンドの処理**
+```javascript
+// 📤 1. 質問をサーバーに送信
+eventSource = new EventSource(`/query/stream?query=親子丼の作り方を教えて`);
+
+// 👂 2. サーバーからの応答を待機
+eventSource.onmessage = (event) => {
+    // 📨 3. 文字が少しずつ届く
+    updateResponse(event.data);
+};
+```
+
+**Step 3: リアルタイム表示**
+```
+💭 AIの思考プロセス（ユーザーには見えない）:
+  🔍 「親子丼」の情報を検索中...
+  📚 関連レシピを4件発見
+  🤖 GPTに質問を送信中...
+
+📺 ユーザーに表示される内容:
+  「おばあちゃんの秘伝レシピによると...」
+  「親子丼の美味しさの秘密は...」  ← リアルタイムで追加
+  「材料（2人分）:」             ← さらに追加
+  「- 鶏もも肉 200g...」         ← 続々と追加
+```
+
+**Step 4: 完成**
+```
+✅ 完全な回答が表示される
+🎯 ユーザーは「AIが考えながら答えている」体験を得る
+💡 単なる回答より「親しみやすさ」を感じる
 ```
 
 ---
 
-## 第7章：魔法の完成 - 動作確認とカスタマイズ
+## 第7章：魔法の完成 - 動作確認とカスタマイズ {#chapter7}
 
-### 🎯 AIおばあちゃんを起動してみよう
+### 🎯 AIおばあちゃんを起動してみよう（2分）
 
-太郎は、ついに完成したRAGシステムを動かしてみることにした。
-
-「でも、どうやって起動するの？」太郎は少し不安になった。
-
-「大丈夫よ、太郎くん。一歩ずつ進めましょう」AIおばあちゃんが優しく教えてくれた。
-
-#### 📦 1. 依存関係のインストール
-
-まず、必要なライブラリをインストールします。
-
+#### ⚡ ワンコマンドで起動
 ```bash
-# 1. 依存関係のインストール
-pip install -r requirements.txt
-```
-
-**💡 このコマンドが何をしているの？**
-- `requirements.txt`に書かれたすべてのライブラリを一度にインストール
-- LangChain、FastAPI、OpenAIなどの必要なツールが揃う
-- 仮想環境内にインストールされるため、他のプロジェクトに影響しない
-
-**🚨 よくあるエラーと解決法：**
-```bash
-# エラー：pip: command not found
-# 解決法：Pythonが正しくインストールされているか確認
-python3 -m pip install -r requirements.txt
-
-# エラー：permission denied
-# 解決法：仮想環境を使用するか、--userフラグを追加
-pip install --user -r requirements.txt
-```
-
-#### 🔑 2. 環境変数設定
-
-OpenAI APIキーを設定します。
-
-```bash
-# 2. 環境変数設定
-export OPENAI_API_KEY="your-api-key-here"
-```
-
-**💡 このコマンドが何をしているの？**
-- OpenAI APIを使用するための認証情報を設定
-- 「your-api-key-here」を実際のAPIキーに置き換える
-- 環境変数として設定することで、コード内に直接書かずに済む
-
-**🔧 実際の設定方法：**
-```bash
-# 実際のAPIキーを設定（例）
-export OPENAI_API_KEY="sk-1234567890abcdefghijklmnopqrstuvwxyz"
-
-# 設定確認
-echo $OPENAI_API_KEY
-```
-
-**🚨 セキュリティ注意点：**
-- APIキーは絶対に公開しない
-- `.env`ファイルに保存して、`.gitignore`に追加する
-- 定期的にキーを再生成する
-
-#### 🗂️ 3. ベクトルストア構築
-
-レシピ情報をベクトル化して検索可能にします。
-
-```bash
-# 3. ベクトルストア構築
-python3 run_etl.py
-```
-
-**💡 このコマンドが何をしているの？**
-- `knowledge/`フォルダ内のマークダウンファイルを読み込み
-- テキストを小さなチャンクに分割
-- 各チャンクをベクトル（数値の配列）に変換
-- FAISSベクトルストアに保存して高速検索を可能にする
-
-**📊 実行時の出力例：**
-```
-📚 Processing knowledge files...
-✅ Loaded 01_basic_rice_dishes.md (1,234 characters)
-✅ Loaded 02_noodle_dishes.md (2,345 characters)
-🔄 Creating vector embeddings...
-✅ Vector store created successfully!
-💾 Saved to vector_store/ directory
-```
-
-**🚨 よくあるエラーと解決法：**
-```bash
-# エラー：No such file or directory: 'knowledge'
-# 解決法：knowledgeフォルダが存在するか確認
-ls -la knowledge/
-
-# エラー：OpenAI API key not set
-# 解決法：環境変数が正しく設定されているか確認
-echo $OPENAI_API_KEY
-
-# エラー：Rate limit exceeded
-# 解決法：少し待ってから再実行
-sleep 60 && python3 run_etl.py
-```
-
-#### 🚀 4. サーバー起動
-
-RAGシステムのWebサーバーを起動します。
-
-```bash
-# 4. サーバー起動
+# AIおばあちゃんを起動！
 python3 server.py
 ```
 
-**💡 このコマンドが何をしているの？**
-- FastAPIサーバーを起動
-- ポート8000でHTTPリクエストを受け付け
-- ベクトルストアを読み込み、質問応答の準備完了
-- ブラウザからアクセス可能な状態になる
-
-**📊 正常起動時の出力：**
+#### ✅ 成功メッセージを確認：
 ```
 🚀 RAG Starter Kit Server starting...
 📝 Loading prompt template...
@@ -568,55 +1415,42 @@ python3 server.py
 INFO:     Uvicorn running on http://0.0.0.0:8000
 ```
 
-**🚨 よくあるエラーと解決法：**
-```bash
-# エラー：Address already in use
-# 解決法：ポートが使用中の場合、プロセスを終了
-lsof -ti:8000 | xargs kill -9
+太郎は、ついに完成したRAGシステムを動かしてみることにした。
 
-# エラー：ModuleNotFoundError
-# 解決法：必要なライブラリがインストールされていない
-pip install -r requirements.txt
+「でも、どうやって起動するの？」太郎は少し不安になった。
 
-# エラー：Vector store not found
-# 解決法：ベクトルストアが作成されていない
-python3 run_etl.py
-```
+「大丈夫よ、太郎くん。一歩ずつ進めましょう」AIおばあちゃんが優しく教えてくれた。
 
-### 🌐 ブラウザでアクセス
+### 🌍 ブラウザでアクセス（1分）
 
-「太郎くん、サーバーが起動したら、ブラウザで確認してみましょう」
-
+#### ⚡ ワンクリックでアクセス
 ```bash
 # デモページを開く
 open http://localhost:8000/RAG_demo.html
+# またはブラウザで直接アクセス
+# http://localhost:8000/RAG_demo.html
 ```
 
-**💡 このコマンドが何をしているの？**
-- ブラウザで`http://localhost:8000/RAG_demo.html`を開く
-- `localhost:8000`はあなたのコンピューター上で動いているサーバー
-- 美しいWeb UIが表示される
+#### 🔑 ログイン情報（デモ用）
+- **ユーザー名**: `admin`
+- **パスワード**: `test123`
 
-**🖥️ 画面の説明：**
-1. **ログイン画面** - ユーザー名：`admin`、パスワード：`test123`
-2. **質問入力欄** - ここに質問を入力
-3. **Submit ボタン** - 質問を送信（Enterキーでも可）
-4. **回答表示欄** - AIおばあちゃんの回答がリアルタイムで表示
+「太郎くん、サーバーが起動したら、ブラウザで確認してみましょう」
 
-**🚨 アクセスできない場合：**
-```bash
-# 1. サーバーが起動しているか確認
-curl http://localhost:8000/health
+### 🍳 実際に質問してみよう（2分）
 
-# 2. ファイアウォールが原因の場合
-# ブラウザで直接アクセス
-# http://127.0.0.1:8000/RAG_demo.html
-
-# 3. ポートが違う場合
-# サーバーの出力を確認してポート番号を確認
+#### 📝 テスト用質問例集
 ```
+日本語：
+- "親子丼の作り方を教えて"
+- "味噌汁の作り方は？"
+- "天ぷらを美味しく作るコツは？"
 
-### 🍳 実際に質問してみよう
+英語：
+- "How to make Oyakodon?"
+- "What's the secret to crispy tempura?"
+- "Give me ideas for bento box dishes"
+```
 
 太郎は、ドキドキしながら初めての質問をしてみることにした。
 
@@ -657,61 +1491,6 @@ curl http://localhost:8000/health
 4. 日本語のプロンプトでGPT-4oに質問
 5. 日本語で自然な回答を生成
 
-#### 🌍 英語での質問
-
-**質問例：**
-```
-Question: "How to make Oyakodon?"
-```
-
-**AIおばあちゃんの回答：**
-```
-According to the traditional recipe, the secret of delicious Oyakodon
-lies in the perfect balance of chicken and eggs.
-
-📋 Ingredients (serves 2):
-- 200g chicken thigh meat
-- 4 eggs
-- 1/2 onion
-- 200ml dashi stock
-- 2 tbsp soy sauce
-- 2 tbsp mirin
-- 1 tbsp sugar
-
-👩‍🍳 Instructions:
-1. Cut chicken into bite-sized pieces and slice onion thinly
-2. Bring dashi, soy sauce, mirin, and sugar to a boil
-3. Add chicken and onion, simmer for 5 minutes
-...
-```
-
-**💡 言語自動検出の仕組み：**
-1. 入力テキストの言語を`langdetect`で判定
-2. 日本語の場合：日本語プロンプトを使用
-3. 英語の場合：英語プロンプトを使用
-4. その他：デフォルトで英語対応
-
-**🎯 実際に試してみよう：**
-
-以下の質問を試してみてください：
-
-```
-日本語：
-- "味噌汁の作り方は？"
-- "天ぷらを美味しく作るコツは？"
-- "お弁当のおかずのアイデアを教えて"
-
-英語：
-- "How to make miso soup?"
-- "What's the secret to crispy tempura?"
-- "Give me ideas for bento box dishes"
-```
-
-**🚨 うまく回答されない場合：**
-- 質問が曖昧すぎる → より具体的に質問
-- 知識ベースにない内容 → `knowledge/`フォルダに情報を追加
-- 回答が途中で切れる → プロンプトの調整が必要
-
 ### 🎨 カスタマイズしてみよう
 
 「太郎くん、基本的なRAGシステムができたら、次は自分だけの特別なアシスタントを作ってみましょう」
@@ -727,14 +1506,10 @@ AIおばあちゃんは、太郎に更なる可能性を見せてくれた。
 
 **🔄 手順1：既存データの削除**
 ```bash
-# 既存のレシピを削除
+# 既存のレシピを削除（バックアップ推奨）
+cp -r knowledge/ knowledge_backup/
 rm knowledge/*.md
 ```
-
-**💡 このコマンドの説明：**
-- `knowledge/`フォルダ内のマークダウンファイルを全て削除
-- 新しい知識ベースを作るための準備
-- 安全のため、削除前にバックアップを取ることを推奨
 
 **📝 手順2：新しい知識を追加**
 ```bash
@@ -760,149 +1535,11 @@ ax² + bx + c = 0 の形の方程式は、因数分解、公式、グラフの�
 sin, cos, tan の関係と、加法定理、倍角公式を覚えましょう。
 ```
 
-**仕事用のアシスタント**
-```markdown
-# knowledge/work_knowledge.md
-## プロジェクト管理
-### アジャイル開発手法
-スプリント期間は通常2-4週間で設定し、毎日スタンドアップミーティングを行います。
-
-### 顧客対応マニュアル
-お客様からのお問い合わせは24時間以内に初回回答を行い、
-解決まで定期的にステータスを更新します。
-```
-
-**趣味用のアシスタント**
-```markdown
-# knowledge/hobby_knowledge.md
-## ギターの基礎
-### 基本コード
-- C: 1フレット1弦、2フレット4弦、3フレット5弦
-- G: 2フレット5弦、3フレット1弦、3フレット6弦
-- Am: 1フレット2弦、2フレット3弦、2フレット4弦
-
-### 練習方法
-毎日30分の練習を継続し、基本コードから始めて
-徐々に楽曲に挑戦していきます。
-```
-
-#### 🎭 2. プロンプトのカスタマイズ
-
-**🎯 なぜプロンプトをカスタマイズ？**
-- AIの性格や専門分野を設定
-- 回答の口調やスタイルを調整
-- より自然で個人的な対話を実現
-
-**📝 設定ファイルの編集**
-```yaml
-# prompt/prompt_japanese_cooking.yaml
-name: "My AI Assistant"
-description: "あなたの専門分野のAIアシスタント"
-system_prompt: "あなたは[分野]の専門家です。"
-```
-
-**🎨 実際のカスタマイズ例：**
-
-**数学の先生アシスタント**
-```yaml
-name: "数学の先生AI"
-description: "数学学習を支援する優しい先生"
-system_prompt: |
-  あなたは数学の専門家で、優しく丁寧に教える先生です。
-  生徒が分からないことがあっても、段階的に説明して理解を促します。
-  数式は可能な限り具体例を示し、視覚的に分かりやすく説明してください。
-  間違いを指摘する際も、励ましながら正しい方向に導いてください。
-```
-
-**プログラミングメンター**
-```yaml
-name: "コーディングメンター"
-description: "プログラミング学習を支援する経験豊富なメンター"
-system_prompt: |
-  あなたは10年以上の経験を持つシニアエンジニアです。
-  コードの書き方、デバッグ方法、ベストプラクティスについて
-  実践的なアドバイスを提供します。
-  初心者にも分かりやすく、実際のコード例を交えて説明してください。
-  エラーの解決方法も具体的に示してください。
-```
-
-**🔄 変更を反映する方法：**
-```bash
-# 設定変更後は必ずサーバーを再起動
-# Ctrl+C でサーバーを停止
-# 再度起動
-python3 server.py
-```
-
-#### 🎨 3. 外観のカスタマイズ
-
-**🎯 なぜUIをカスタマイズ？**
-- ブランドイメージに合わせた外観
-- 使いやすさの向上
-- 個人的な好みやテーマの反映
-
-**📝 HTMLファイルの編集**
-```html
-<!-- RAG_demo.html -->
-<h1 class="text-3xl font-bold text-white">
-    🤖 My AI Assistant
-</h1>
-```
-
-**🎨 カスタマイズ例：**
-
-**学習用テーマ**
-```html
-<h1 class="text-3xl font-bold text-blue-600">
-    📚 Study Buddy AI
-</h1>
-<!-- 背景色を学習に集中しやすい青系に変更 -->
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100">
-```
-
-**ビジネス用テーマ**
-```html
-<h1 class="text-3xl font-bold text-gray-800">
-    💼 Business Assistant
-</h1>
-<!-- プロフェッショナルな印象のグレー系 -->
-<body class="bg-gradient-to-br from-gray-50 to-slate-100">
-```
-
-**🎯 色の選び方のコツ：**
-- **教育系**: 青系（集中力向上）
-- **ビジネス系**: グレー・紺系（プロフェッショナル）
-- **創作系**: 緑系（創造性促進）
-- **医療系**: 白・水色系（清潔感）
-
-**🔄 変更の確認方法：**
-```bash
-# ブラウザでページを更新
-# Cmd+R (Mac) または Ctrl+R (Windows)
-# 変更が反映されているかを確認
-```
-
-**📱 レスポンシブデザインの調整：**
-```html
-<!-- スマートフォン対応 -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- タブレット向けレイアウト -->
-<div class="md:grid-cols-2 lg:grid-cols-3">
-    <!-- コンテンツ -->
-</div>
-```
-
-**🚀 さらなるカスタマイズのアイデア：**
-- ロゴの追加
-- カスタムフォントの使用
-- アニメーション効果の追加
-- ダークモード対応
-- 多言語対応のUI
-
 ---
 
-## 第8章：実践的な活用例
+# 🚀 ここからが本番！応用編
+
+## 第8章：実践的な活用例 {#chapter8}
 
 「太郎くん、RAGシステムは料理だけじゃなくて、いろんな分野で活用できるのよ」
 
@@ -939,70 +1576,6 @@ AIおばあちゃんは、太郎に様々な活用例を見せてくれた。
 急病の場合は、事後申請も可能です。
 ```
 
-**ステップ2：プロンプトの最適化**
-```yaml
-# prompt/prompt_japanese_cooking.yaml
-name: "社内FAQアシスタント"
-description: "社内規則や手続きに関する質問にお答えします"
-system_prompt: |
-  あなたは会社の人事部門の専門スタッフです。
-  従業員からの質問に対して、正確で分かりやすい回答を提供します。
-  不明な点がある場合は、人事部門への確認を促してください。
-  常に親切で丁寧な対応を心がけてください。
-```
-
-**🎯 期待される効果：**
-- 人事部門の問い合わせ件数：月100件 → 月15件
-- 回答時間：平均2時間 → 即座に回答
-- 従業員満足度：85% → 95%に向上
-
-#### 📖 2. 製品マニュアル
-
-**🎯 なぜスマートなマニュアルが必要？**
-- 顧客サポートコストを70%削減
-- 製品の使い方を即座に検索可能
-- 多言語対応で海外展開をサポート
-- 動画や画像も含めた包括的な説明
-
-**📝 実装手順：**
-
-**ステップ1：マニュアルデータの整理**
-```markdown
-# knowledge/product_manual.md
-## 製品Aの使用方法
-### 初期設定
-1. 電源を入れる
-2. 設定メニューを開く
-3. Wi-Fi設定を完了
-4. アカウント登録
-
-### よくある問題と解決法
-**Q: 電源が入らない**
-A: 以下の手順で確認してください：
-1. 電源ケーブルが正しく接続されているか
-2. コンセントに電源が供給されているか
-3. 本体の電源ボタンを3秒間長押し
-
-**Q: Wi-Fi接続ができない**
-A: ネットワーク設定を確認してください：
-1. Wi-Fiパスワードが正しいか
-2. 2.4GHz帯域に接続しているか
-3. ルーターの再起動を試す
-```
-
-**ステップ2：検索の最適化**
-```bash
-# より詳細な検索結果を取得
-# config.py の設定を調整
-RETRIEVAL_K = 5  # 検索結果数を増加
-CHUNK_SIZE = 800  # チャンクサイズを調整
-```
-
-**🎯 期待される効果：**
-- サポート問い合わせ：月500件 → 月150件
-- 顧客満足度：78% → 92%
-- サポート担当者の工数：60%削減
-
 ### 🎓 教育での活用
 
 #### 📚 1. 学習支援システム
@@ -1013,482 +1586,9 @@ CHUNK_SIZE = 800  # チャンクサイズを調整
 - 繰り返し学習で理解度を向上
 - 苦手分野の集中的な学習をサポート
 
-**📝 実装手順：**
-
-**ステップ1：学習コンテンツの準備**
-```markdown
-# knowledge/math_basics.md
-## 二次方程式の解法
-### 因数分解による解法
-ax² + bx + c = 0 の形の方程式は因数分解で解けます。
-
-**例題1：** x² + 5x + 6 = 0
-解法：
-1. 因数分解：(x + 2)(x + 3) = 0
-2. 各因数をゼロとする：x + 2 = 0 または x + 3 = 0
-3. 解：x = -2, -3
-
-**練習問題：**
-- x² + 7x + 12 = 0
-- x² - 5x + 6 = 0
-- x² + 3x - 4 = 0
-```
-
-**ステップ2：教師用プロンプト**
-```yaml
-name: "数学の先生AI"
-description: "数学学習を支援する優しい先生"
-system_prompt: |
-  あなたは経験豊富な数学教師です。
-  生徒の理解度に応じて、段階的に説明します。
-  間違いがあっても励ましながら、正しい方向に導いてください。
-  具体例を多く使い、視覚的に分かりやすく説明してください。
-  必要に応じて、追加の練習問題を提供してください。
-```
-
-**🎯 学習効果の測定：**
-- 理解度テストの平均点：65点 → 82点
-- 学習継続率：40% → 75%
-- 質問回数：週1回 → 週5回（積極的な学習）
-
-#### 🌍 2. 言語学習アシスタント
-
-**🎯 なぜ言語学習にRAGが効果的？**
-- 文脈に応じた適切な表現を提案
-- 会話練習パートナーとして機能
-- 文法説明を実用的な例文で提供
-- 学習者のレベルに応じた段階的な指導
-
-**📝 実装手順：**
-
-**ステップ1：言語データベースの構築**
-```markdown
-# knowledge/english_phrases.md
-## 日常会話フレーズ
-### 挨拶
-- Good morning = おはようございます
-- How are you? = 調子はどう？
-- Nice to meet you = はじめまして
-
-### 場面別表現
-**レストランで：**
-- I'd like to make a reservation = 予約を取りたいのですが
-- Can I have the menu? = メニューをいただけますか？
-- The check, please = お会計をお願いします
-
-**買い物で：**
-- How much is this? = これはいくらですか？
-- Do you have this in a different size? = 違うサイズはありますか？
-- I'm just looking = 見ているだけです
-```
-
-**ステップ2：言語学習用プロンプト**
-```yaml
-name: "英会話コーチ"
-description: "英語学習を支援する親切なコーチ"
-system_prompt: |
-  あなたは英語学習の専門コーチです。
-  学習者のレベルに応じて、適切な表現を提案します。
-  発音のコツ、文法の説明、実践的な使い方を教えてください。
-  間違いを優しく訂正し、自信を持って話せるよう励ましてください。
-  文化的な背景も含めて、自然な英語表現を指導してください。
-```
-
-**🎯 学習効果：**
-- 語彙力：500語 → 1,500語（3ヶ月）
-- 会話継続時間：30秒 → 5分
-- 学習モチベーション：大幅向上
-
-### 🏠 個人での活用
-
-#### 💰 1. 家計簿アシスタント
-
-**🎯 なぜ家計管理にRAGが役立つ？**
-- 支出パターンの分析と改善提案
-- 節約アイデアの個人化
-- 予算管理のリアルタイムアドバイス
-- 投資や貯蓄の戦略提案
-
-**📝 実装手順：**
-
-**ステップ1：家計情報の整理**
-```markdown
-# knowledge/finance_tips.md
-## 家計管理のコツ
-### 支出の記録方法
-1. レシートを写真で保存
-2. カテゴリ別に分類（食費、交通費、娯楽費など）
-3. 月末に集計して予算と比較
-4. 無駄遣いを特定して改善
-
-### 節約テクニック
-**食費の削減：**
-- 週単位での買い物計画
-- 特売日の活用
-- 冷凍食品の活用
-- 自炊の習慣化
-
-**固定費の見直し：**
-- 携帯料金プランの最適化
-- 保険の見直し
-- 定期購読サービスの整理
-```
-
-**🎯 期待される効果：**
-- 月間支出：15%削減
-- 貯蓄額：月3万円 → 月5万円
-- 家計管理時間：週2時間 → 週30分
-
-#### 🏃‍♂️ 2. 健康管理アシスタント
-
-**🎯 なぜ健康管理にRAGが効果的？**
-- 個人の体質や生活習慣に合わせたアドバイス
-- 運動や食事のパーソナルな提案
-- 健康状態の継続的なモニタリング
-- モチベーション維持のサポート
-
-**📝 実装手順：**
-
-**ステップ1：健康情報の蓄積**
-```markdown
-# knowledge/health_tips.md
-## 運動習慣の作り方
-### 初心者向けメニュー
-- 週3回、30分のウォーキング
-- 毎日5分のストレッチ
-- 階段を使う習慣
-- 家事を運動として活用
-
-### 食事管理
-**バランスの良い食事：**
-- 野菜：1日350g以上
-- タンパク質：体重×1.2g
-- 炭水化物：全カロリーの50-60%
-- 脂質：全カロリーの20-25%
-
-### 睡眠の質向上
-- 就寝2時間前のスマホ使用停止
-- 室温18-22度の維持
-- 規則正しい就寝時間
-- カフェインは午後2時以降控える
-```
-
-**🎯 健康改善効果：**
-- 体重：3ヶ月で5kg減量
-- 睡眠の質：40%改善
-- 運動継続率：30% → 80%
-- 健康診断結果：すべて正常範囲内
-
 ---
 
-## 第9章：さらなる発展とベストプラクティス
-
-「太郎くん、基本的なRAGシステムができたら、次は本格的な運用を考えてみましょう」
-
-AIおばあちゃんは、太郎にプロフェッショナルなRAGシステムの構築方法を教えてくれた。
-
-### 🚀 パフォーマンス最適化
-
-#### ⚡ 1. チャンクサイズの最適化
-
-**🎯 なぜチャンクサイズが重要？**
-- 検索精度と回答品質に直接影響
-- 計算コストとメモリ使用量を左右
-- 文脈の保持と処理速度のバランス
-
-**📝 最適化手順：**
-
-```python
-# config.py
-CHUNK_SIZE = 1000  # 長い文書の場合
-CHUNK_OVERLAP = 200  # 重複を増やして文脈を保持
-```
-
-**💡 チャンクサイズの選び方：**
-
-| 文書タイプ | 推奨サイズ | 重複 | 理由 |
-|------------|------------|------|------|
-| 短い記事   | 500-800    | 100  | 要点を1つのチャンクに |
-| 技術文書   | 1000-1500  | 200  | 複雑な概念を保持 |
-| 小説・物語 | 800-1200   | 150  | 文脈と流れを維持 |
-| FAQ        | 300-500    | 50   | 1問1答を1チャンクに |
-
-**🔧 実際のテスト方法：**
-```python
-# 異なるチャンクサイズでテスト
-chunk_sizes = [500, 1000, 1500]
-for size in chunk_sizes:
-    # 設定変更
-    CHUNK_SIZE = size
-    # ベクトルストア再構築
-    python3 run_etl.py
-    # 質問テスト
-    test_query = "親子丼の作り方"
-    # 回答品質を評価
-```
-
-#### 🔍 2. 検索結果数の最適化
-
-**🎯 なぜ検索結果数が重要？**
-- 情報の網羅性と処理速度のトレードオフ
-- 関連性の低い情報の混入を防ぐ
-- APIコストとレスポンス時間に影響
-
-```python
-RETRIEVAL_K = 10  # より多くの関連情報を取得
-```
-
-**📊 検索結果数の効果分析：**
-
-| 検索結果数 | 回答品質 | 処理時間 | APIコスト | 推奨用途 |
-|------------|----------|----------|-----------|----------|
-| 3-5        | 普通     | 高速     | 低        | 簡単な質問 |
-| 8-10       | 良好     | 中程度   | 中        | 一般的な質問 |
-| 15-20      | 優秀     | 低速     | 高        | 複雑な質問 |
-
-**🎯 動的調整の実装：**
-```python
-def get_dynamic_k(query: str) -> int:
-    # 質問の複雑さに応じて検索結果数を調整
-    if len(query.split()) <= 5:
-        return 5  # 簡単な質問
-    elif len(query.split()) <= 10:
-        return 8  # 中程度の質問
-    else:
-        return 12  # 複雑な質問
-```
-
-#### 🤖 3. モデルの選択と最適化
-
-**🎯 モデル選択の基準：**
-
-```python
-LLM_MODEL = "gpt-3.5-turbo"  # コスト重視
-LLM_MODEL = "gpt-4o"         # 品質重視
-```
-
-**📊 モデル比較表：**
-
-| モデル | 品質 | 速度 | コスト | 推奨用途 |
-|--------|------|------|--------|----------|
-| GPT-3.5-turbo | 良好 | 高速 | 低 | 一般的な質問応答 |
-| GPT-4o | 優秀 | 中速 | 中 | 複雑な分析・推論 |
-| GPT-4-turbo | 最高 | 低速 | 高 | 専門的な質問 |
-
-**⚙️ 用途別設定例：**
-
-```python
-# 本番環境用（品質重視）
-PRODUCTION_CONFIG = {
-    "model": "gpt-4o",
-    "temperature": 0.1,
-    "max_tokens": 1000,
-    "top_p": 0.9
-}
-
-# 開発環境用（コスト重視）
-DEVELOPMENT_CONFIG = {
-    "model": "gpt-3.5-turbo",
-    "temperature": 0.3,
-    "max_tokens": 500,
-    "top_p": 0.8
-}
-```
-
-### 🔒 セキュリティ対策
-
-#### 🛡️ 1. 環境変数の管理
-
-**🎯 なぜセキュリティが重要？**
-- APIキーの漏洩防止
-- 機密情報の保護
-- 不正アクセスの防止
-
-```bash
-# .env ファイルは必ず .gitignore に追加
-echo ".env" >> .gitignore
-```
-
-**🔐 完全なセキュリティ設定：**
-
-```bash
-# .env.example（テンプレート）
-OPENAI_API_KEY=your-api-key-here
-DEMO_USERNAME=admin
-DEMO_PASSWORD=your-secure-password
-JWT_SECRET=your-jwt-secret-key
-ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
-```
-
-```bash
-# .gitignore
-.env
-.env.local
-.env.production
-*.log
-vector_store/
-__pycache__/
-```
-
-**🚨 セキュリティチェックリスト：**
-- [ ] APIキーが.envファイルに保存されている
-- [ ] .envファイルが.gitignoreに追加されている
-- [ ] 本番環境では強力なパスワードを使用
-- [ ] HTTPS通信を使用
-- [ ] 定期的なAPIキーのローテーション
-
-#### 🔍 2. 入力検証
-
-**🎯 なぜ入力検証が必要？**
-- インジェクション攻撃の防止
-- 異常なリクエストの検出
-- システムの安定性確保
-
-```python
-class QueryRequest(BaseModel):
-    query: str = Field(..., max_length=1000)
-    user_id: str = Field(..., max_length=100)
-```
-
-**🛡️ 包括的な入力検証：**
-
-```python
-from pydantic import BaseModel, Field, validator
-import re
-
-class QueryRequest(BaseModel):
-    query: str = Field(..., min_length=1, max_length=1000)
-    user_id: str = Field(..., max_length=100)
-    language: str = Field(default="auto", regex="^(auto|ja|en)$")
-    
-    @validator('query')
-    def validate_query(cls, v):
-        # 危険な文字の除外
-        dangerous_chars = ['<', '>', '"', "'", '&']
-        for char in dangerous_chars:
-            if char in v:
-                raise ValueError(f'危険な文字が含まれています: {char}')
-        return v
-    
-    @validator('user_id')
-    def validate_user_id(cls, v):
-        # 英数字とハイフンのみ許可
-        if not re.match(r'^[a-zA-Z0-9-]+$', v):
-            raise ValueError('ユーザーIDは英数字とハイフンのみ使用可能です')
-        return v
-```
-
-#### ⏱️ 3. レート制限
-
-**🎯 なぜレート制限が必要？**
-- DDoS攻撃の防止
-- APIコストの制御
-- サーバーリソースの保護
-
-```python
-from slowapi import Limiter
-limiter = Limiter(key_func=get_remote_address)
-
-@app.post("/query")
-@limiter.limit("10/minute")
-async def query_endpoint(request: Request, ...):
-    pass
-```
-
-**⚙️ 段階的なレート制限：**
-
-```python
-# slowapi のインストール
-pip install slowapi
-
-# server.py
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-# 段階的な制限
-@app.post("/query")
-@limiter.limit("5/minute")    # 1分間に5回
-@limiter.limit("50/hour")     # 1時間に50回
-@limiter.limit("500/day")     # 1日に500回
-async def query_endpoint(request: Request, query_data: QueryRequest):
-    # 処理...
-```
-
-**📊 レート制限設定の例：**
-
-| ユーザータイプ | 1分間 | 1時間 | 1日間 | 用途 |
-|----------------|--------|--------|--------|------|
-| 匿名ユーザー   | 3回    | 20回   | 100回  | 試用 |
-| 登録ユーザー   | 10回   | 100回  | 1000回 | 一般利用 |
-| プレミアム     | 30回   | 500回  | 5000回 | 高頻度利用 |
-| 開発者         | 100回  | 2000回 | 10000回| API開発 |
-
-**🔧 カスタムレート制限：**
-
-```python
-def get_user_limit(user_id: str) -> str:
-    # ユーザータイプに応じた制限
-    user_type = get_user_type(user_id)
-    
-    if user_type == "premium":
-        return "30/minute"
-    elif user_type == "registered":
-        return "10/minute"
-    else:
-        return "3/minute"
-
-@app.post("/query")
-async def query_endpoint(request: Request, query_data: QueryRequest):
-    limit = get_user_limit(query_data.user_id)
-    await limiter.limit(limit)(request)
-    # 処理...
-```
-
-### 📊 監視とログ
-
-**1. 構造化ログ**
-```python
-import logging
-import json
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-
-logger = logging.getLogger(__name__)
-
-def log_query(query: str, response: str, user_id: str):
-    logger.info(json.dumps({
-        "event": "query_processed",
-        "query": query,
-        "response_length": len(response),
-        "user_id": user_id,
-        "timestamp": datetime.now().isoformat()
-    }))
-```
-
-**2. メトリクス収集**
-```python
-from prometheus_client import Counter, Histogram
-
-query_counter = Counter('rag_queries_total', 'Total queries processed')
-response_time = Histogram('rag_response_time_seconds', 'Response time')
-
-@response_time.time()
-def process_query(query: str):
-    query_counter.inc()
-    # 処理...
-```
-
----
-
-## 第10章：トラブルシューティング
+## 第9章：トラブルシューティング {#chapter9}
 
 「太郎くん、どんなシステムでも問題は発生するもの。大切なのは、問題を素早く見つけて解決することよ」
 
@@ -1545,11 +1645,6 @@ pip install -r requirements.txt
 pip install langchain langdetect fastapi uvicorn
 ```
 
-**🚨 予防策：**
-- 作業開始時に必ず仮想環境を確認
-- requirements.txtを常に最新に保つ
-- 定期的な依存関係のチェック
-
 #### 🔑 2. OpenAI API エラー
 
 **🚨 エラー例：**
@@ -1558,11 +1653,6 @@ openai.error.RateLimitError: Rate limit exceeded
 openai.error.InvalidRequestError: Invalid API key
 openai.error.AuthenticationError: Incorrect API key
 ```
-
-**💡 原因：**
-- APIキーが正しく設定されていない
-- API使用制限に達している
-- 請求情報が正しくない
 
 **🔧 解決法：**
 
@@ -1598,383 +1688,9 @@ except Exception as e:
     print(f"その他のエラー: {e}")
 ```
 
-**ステップ3：使用量の監視**
-```python
-# 使用量監視機能
-import time
-from functools import wraps
-
-def rate_limit_wrapper(max_calls=10, time_window=60):
-    calls = []
-    
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            now = time.time()
-            # 古い呼び出しを削除
-            calls[:] = [call for call in calls if now - call < time_window]
-            
-            if len(calls) >= max_calls:
-                wait_time = time_window - (now - calls[0])
-                print(f"{wait_time:.1f}秒待機中...")
-                time.sleep(wait_time)
-            
-            calls.append(now)
-            return func(*args, **kwargs)
-        return wrapper
-    return decorator
-
-@rate_limit_wrapper(max_calls=5, time_window=60)
-def call_openai_api(prompt):
-    # API呼び出し
-    pass
-```
-
-**🚨 予防策：**
-- API使用量の定期的な監視
-- レート制限の実装
-- 請求アラートの設定
-
-#### 🗂️ 3. ベクトルストアの読み込みエラー
-
-**🚨 エラー例：**
-```bash
-FileNotFoundError: vector_store directory not found
-RuntimeError: FAISS index is empty
-ValueError: No documents found in knowledge directory
-```
-
-**💡 原因：**
-- ベクトルストアが正しく構築されていない
-- knowledgeフォルダが空
-- ファイルアクセス権限の問題
-
-**🔧 解決法：**
-
-**ステップ1：ディレクトリ構造の確認**
-```bash
-# プロジェクト構造の確認
-ls -la
-# 期待される出力：knowledge/, vector_store/
-
-# ナレッジファイルの確認
-ls -la knowledge/
-# 期待される出力：*.md ファイル群
-```
-
-**ステップ2：ベクトルストアの再構築**
-```bash
-# 既存のベクトルストアを削除
-rm -rf vector_store/
-
-# 再構築
-python3 run_etl.py
-```
-
-**ステップ3：詳細なデバッグ**
-```python
-# run_etl.py にデバッグ機能を追加
-import os
-import glob
-
-def debug_knowledge_loading():
-    knowledge_dir = "knowledge"
-    
-    # ディレクトリの存在確認
-    if not os.path.exists(knowledge_dir):
-        print(f"❌ {knowledge_dir} ディレクトリが存在しません")
-        return False
-    
-    # ファイルの確認
-    md_files = glob.glob(f"{knowledge_dir}/*.md")
-    print(f"📁 発見されたファイル数: {len(md_files)}")
-    
-    for file in md_files:
-        size = os.path.getsize(file)
-        print(f"📄 {file}: {size} bytes")
-        
-        # 内容の確認
-        with open(file, 'r', encoding='utf-8') as f:
-            content = f.read()
-            print(f"   内容: {content[:100]}...")
-    
-    return len(md_files) > 0
-
-# デバッグ実行
-if __name__ == "__main__":
-    debug_knowledge_loading()
-```
-
-**🚨 予防策：**
-- 定期的なベクトルストアのバックアップ
-- ファイル変更時の自動再構築
-- 権限設定の確認
-
-#### 🌐 4. ポート競合エラー
-
-**🚨 エラー例：**
-```bash
-ERROR: [Errno 48] Address already in use
-OSError: [Errno 98] Address already in use
-```
-
-**💡 原因：**
-- 既に同じポートでサーバーが起動している
-- 前回のサーバーが正しく終了していない
-- 他のアプリケーションがポートを使用中
-
-**🔧 解決法：**
-
-**ステップ1：ポート使用状況の確認**
-```bash
-# ポート8000を使用しているプロセスを確認
-lsof -ti:8000
-# または
-netstat -tlnp | grep :8000
-```
-
-**ステップ2：プロセスの終了**
-```bash
-# 特定のプロセスを終了
-kill -9 $(lsof -ti:8000)
-
-# 全てのPythonプロセスを確認
-ps aux | grep python
-```
-
-**ステップ3：代替ポートの使用**
-```bash
-# 異なるポートで起動
-export PORT=8080
-python3 server.py
-
-# または直接指定
-uvicorn server:app --port 8080
-```
-
-**🔧 自動的な解決方法：**
-```python
-# server.py に自動ポート検出機能を追加
-import socket
-import uvicorn
-
-def find_free_port(start_port=8000, max_port=8100):
-    """利用可能なポートを見つける"""
-    for port in range(start_port, max_port):
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.bind(('localhost', port))
-                return port
-        except OSError:
-            continue
-    raise RuntimeError("利用可能なポートが見つかりません")
-
-if __name__ == "__main__":
-    port = find_free_port()
-    print(f"🚀 サーバーをポート {port} で起動します")
-    uvicorn.run(app, host="0.0.0.0", port=port)
-```
-
-**🚨 予防策：**
-- サーバー終了時のクリーンアップ
-- 開発環境での専用ポート使用
-- Docker使用時のポートマッピング設定
-
-### 🔍 デバッグ方法
-
-#### 📊 1. ログレベルの変更
-
-**🎯 なぜログが重要？**
-- 問題の原因を特定
-- システムの動作状況を把握
-- パフォーマンスの監視
-
-```python
-import logging
-logging.basicConfig(level=logging.DEBUG)
-```
-
-**📝 包括的なログ設定：**
-```python
-import logging
-import sys
-from datetime import datetime
-
-# ログフォーマットの設定
-log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-logging.basicConfig(
-    level=logging.INFO,
-    format=log_format,
-    handlers=[
-        logging.FileHandler('rag_server.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
-
-# 各モジュールのログレベル設定
-logging.getLogger('uvicorn').setLevel(logging.INFO)
-logging.getLogger('openai').setLevel(logging.WARNING)
-logging.getLogger('faiss').setLevel(logging.ERROR)
-
-logger = logging.getLogger(__name__)
-
-# 使用例
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    start_time = datetime.now()
-    
-    logger.info(f"Request: {request.method} {request.url}")
-    
-    response = await call_next(request)
-    
-    process_time = (datetime.now() - start_time).total_seconds()
-    logger.info(f"Response: {response.status_code} ({process_time:.2f}s)")
-    
-    return response
-```
-
-#### 🔍 2. 検索結果の確認
-
-**🎯 なぜ検索結果の確認が重要？**
-- 関連性の低い情報が含まれていないか
-- 検索精度の評価
-- チューニングの効果測定
-
-```python
-def debug_retrieval(query: str):
-    docs = vector_store.similarity_search(query, k=3)
-    for i, doc in enumerate(docs):
-        print(f"Document {i}: {doc.page_content[:100]}...")
-```
-
-**📝 詳細なデバッグ機能：**
-```python
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-
-def advanced_debug_retrieval(query: str, k: int = 5):
-    """高度な検索結果デバッグ"""
-    
-    # 検索実行
-    docs_with_scores = vector_store.similarity_search_with_score(query, k=k)
-    
-    print(f"🔍 検索クエリ: {query}")
-    print(f"📊 検索結果数: {len(docs_with_scores)}")
-    print("=" * 50)
-    
-    for i, (doc, score) in enumerate(docs_with_scores):
-        print(f"📄 文書 {i+1} (スコア: {score:.4f})")
-        print(f"📝 内容: {doc.page_content[:200]}...")
-        print(f"🏷️  メタデータ: {doc.metadata}")
-        print("-" * 30)
-    
-    # スコア分析
-    scores = [score for _, score in docs_with_scores]
-    print(f"📈 スコア統計:")
-    print(f"   最高: {max(scores):.4f}")
-    print(f"   最低: {min(scores):.4f}")
-    print(f"   平均: {np.mean(scores):.4f}")
-    print(f"   標準偏差: {np.std(scores):.4f}")
-    
-    return docs_with_scores
-
-# より詳細な分析
-def analyze_search_quality(query: str, expected_keywords: list):
-    """検索品質の分析"""
-    docs = vector_store.similarity_search(query, k=10)
-    
-    keyword_hits = {keyword: 0 for keyword in expected_keywords}
-    
-    for doc in docs:
-        content = doc.page_content.lower()
-        for keyword in expected_keywords:
-            if keyword.lower() in content:
-                keyword_hits[keyword] += 1
-    
-    print(f"🎯 キーワード検出結果:")
-    for keyword, hits in keyword_hits.items():
-        print(f"   {keyword}: {hits}/10 文書")
-    
-    return keyword_hits
-```
-
-#### 🎭 3. プロンプトの検証
-
-**🎯 なぜプロンプト検証が重要？**
-- 意図しない回答の原因特定
-- プロンプトの改善ポイント発見
-- A/Bテストの実施
-
-```python
-def debug_prompt(query: str):
-    prompt = get_dynamic_prompt_template(query)
-    print(f"Generated prompt: {prompt}")
-```
-
-**📝 高度なプロンプトデバッグ：**
-```python
-def comprehensive_prompt_debug(query: str):
-    """包括的なプロンプトデバッグ"""
-    
-    # 言語検出
-    detected_lang = detect_language(query)
-    print(f"🌍 検出言語: {detected_lang}")
-    
-    # 検索実行
-    docs = vector_store.similarity_search(query, k=5)
-    context = "\n".join([doc.page_content for doc in docs])
-    
-    # プロンプト生成
-    prompt_template = get_dynamic_prompt_template(query)
-    final_prompt = prompt_template.format(context=context, question=query)
-    
-    print(f"📝 最終プロンプト:")
-    print("=" * 50)
-    print(final_prompt)
-    print("=" * 50)
-    
-    # プロンプト分析
-    prompt_length = len(final_prompt)
-    context_length = len(context)
-    
-    print(f"📊 プロンプト統計:")
-    print(f"   全長: {prompt_length} 文字")
-    print(f"   コンテキスト: {context_length} 文字")
-    print(f"   質問: {len(query)} 文字")
-    print(f"   テンプレート: {prompt_length - context_length - len(query)} 文字")
-    
-    return final_prompt
-
-# プロンプトA/Bテスト
-def prompt_ab_test(query: str, prompt_a: str, prompt_b: str):
-    """プロンプトA/Bテスト"""
-    
-    results = {}
-    
-    for name, prompt in [("A", prompt_a), ("B", prompt_b)]:
-        print(f"🧪 テスト {name}:")
-        
-        # 実際にLLMを呼び出して比較
-        # response = llm.invoke(prompt)
-        # results[name] = response
-        
-        print(f"   プロンプト長: {len(prompt)}")
-        print(f"   プロンプト: {prompt[:100]}...")
-        print("-" * 30)
-    
-    return results
-```
-
-**🎯 実践的なデバッグワークフロー：**
-1. **エラーログの確認** → 問題の特定
-2. **検索結果の分析** → 関連性の評価
-3. **プロンプトの検証** → 指示の明確さ確認
-4. **設定の調整** → パフォーマンス改善
-5. **再テスト** → 改善効果の確認
-
 ---
 
-## エピローグ：あなたの番です
+## エピローグ：あなたの番です {#epilogue}
 
 ### 🎉 おめでとう！
 
@@ -2010,39 +1726,32 @@ RAGは、AIに「専門知識」を持たせる魔法の技術。でも、本当
 
 ---
 
-## 🔗 参考資料
+## 🎯 まとめ - 10分で学んだこと
 
-### 📚 技術リファレンス
+### ✅ 完了チェックリスト
+- [ ] RAGの基本概念を理解
+- [ ] 開発環境の構築完了
+- [ ] ベクトルストアの作成完了
+- [ ] AIチャットボットの動作確認完了
+- [ ] カスタマイズ方法を理解
+- [ ] トラブルシューティング方法を把握
 
-- **LangChain公式ドキュメント**: https://python.langchain.com/
-- **FastAPI公式ドキュメント**: https://fastapi.tiangolo.com/
-- **OpenAI API リファレンス**: https://platform.openai.com/docs
-- **FAISS GitHub**: https://github.com/facebookresearch/faiss
+### 🚀 次に学ぶべきこと
+1. **LangChainの深い理解** - より高度な機能の活用
+2. **ベクトルデータベース** - ChromaDB、Pineconeなど
+3. **プロンプトエンジニアリング** - より効果的な指示方法
+4. **本格的なデプロイ** - DockerやAWSを使った運用
 
-### 🛠️ 開発ツール
-
-- **Visual Studio Code**: https://code.visualstudio.com/
-- **GitHub Desktop**: https://desktop.github.com/
-- **Docker**: https://www.docker.com/
-- **Postman**: https://www.postman.com/
-
-### 🎓 学習リソース
-
-- **機械学習 Coursera**: https://www.coursera.org/learn/machine-learning
-- **Deep Learning Specialization**: https://www.coursera.org/specializations/deep-learning
-- **Python.org チュートリアル**: https://docs.python.org/3/tutorial/
-
-### 🌐 コミュニティ
-
-- **Reddit - r/MachineLearning**: https://www.reddit.com/r/MachineLearning/
-- **Stack Overflow**: https://stackoverflow.com/questions/tagged/langchain
-- **Discord - AI/ML コミュニティ**: 各種サーバーに参加
+### 🔗 学習リソース
+- [LangChain公式ドキュメント](https://python.langchain.com/)
+- [OpenAI API リファレンス](https://platform.openai.com/docs)
+- [RAG Starter Kit GitHub](https://github.com/takusaotome/rag-starter-kit)
 
 ---
 
 ## 🏷️ タグ
 
-`#RAG` `#AI` `#ChatBot` `#Python` `#FastAPI` `#LangChain` `#OpenAI` `#初心者` `#チュートリアル` `#機械学習` `#自然言語処理` `#ベクトル検索` `#知識ベース` `#プログラミング学習`
+`#RAG` `#AI` `#ChatBot` `#Python` `#FastAPI` `#LangChain` `#OpenAI` `#初心者` `#チュートリアル` `#機械学習` `#自然言語処理` `#ベクトル検索` `#知識ベース` `#プログラミング学習` `#10分チュートリアル` `#実践的`
 
 ---
 
@@ -2052,6 +1761,7 @@ RAGは、AIに「専門知識」を持たせる魔法の技術。でも、本当
 
 ---
 
-*最終更新日: 2025年7月*
-*執筆者: AI と人間のコラボレーション*
-*ライセンス: MIT License* 
+*最終更新日: 2025年7月*  
+*執筆者: AI と人間のコラボレーション*  
+*ライセンス: MIT License*  
+*テスト環境: Python 3.11, OpenAI GPT-4o, LangChain 0.2.0*
