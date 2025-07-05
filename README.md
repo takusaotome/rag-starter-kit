@@ -186,6 +186,8 @@ python3 server.py
 
 ### 6. Ask Your First Question
 
+#### Option A: Command Line Interface
+
 ```bash
 # Health check
 curl http://localhost:8000/health
@@ -201,6 +203,58 @@ python3 query_cli.py --interactive
 # "How do you make perfect sushi rice?"
 # "What's the difference between ramen and udon?"
 ```
+
+#### Option B: Web Interface Demo
+
+**🌐 Interactive Web Demo with Real-time Streaming**
+
+For a more user-friendly experience, you can use the included web interface:
+
+```bash
+# First, generate the HTML file with your server URL
+python3 generate_html.py
+
+# Then open the web demo in your browser
+open RAG_demo.html
+# Or manually navigate to the RAG_demo.html file in your browser
+```
+
+**🔧 Customize Server URL**: Edit your `.env` file to change the server URL:
+```env
+SERVER_URL=http://localhost:8000  # For local development
+# SERVER_URL=https://your-domain.com  # For production
+```
+
+![RAG Demo Interface](screenshots/rag_demo_interface.png)
+
+**✨ Web Demo Features:**
+- **🎨 Beautiful UI**: Clean, responsive interface with modern design
+- **🔐 Authentication**: Secure JWT-based login system
+- **⚡ Real-time Streaming**: Watch AI responses appear in real-time
+- **📝 Markdown Support**: Properly formatted responses with syntax highlighting
+- **📚 Source References**: See which documents were used to generate answers
+- **⌨️ Keyboard Shortcuts**: Press Enter to submit questions quickly
+- **📱 Mobile Friendly**: Responsive design works on all devices
+
+**🚀 How to Use the Web Demo:**
+
+1. **Launch the Server**: Make sure your RAG server is running (step 5 above)
+
+2. **Open the Web Interface**: Open `RAG_demo.html` in your browser
+
+3. **Login**: Use the default credentials:
+   - Username: `admin`
+   - Password: `test123`
+
+4. **Ask Questions**: Type your question in the query box and click Submit or press Enter
+
+5. **Watch Real-time Responses**: See the AI generate answers in real-time with proper markdown formatting
+
+**💡 Demo Tips:**
+- Try asking: "How to make Oyakodon?" or "What are the main ingredients for sushi?"
+- Watch how the system retrieves relevant sources and generates comprehensive answers
+- Notice the real-time streaming effect as the AI composes its response
+- Observe how markdown formatting makes the responses easy to read
 
 ## 🎨 Customization Guide - Make It Your Own
 

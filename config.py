@@ -24,6 +24,7 @@ class Config:
     # サーバー設定
     HOST = os.getenv("HOST", "0.0.0.0")
     PORT = int(os.getenv("PORT", "8000"))
+    SERVER_URL = os.getenv("SERVER_URL", "http://localhost:8000")
 
     # MCP Server Configuration
     MCP_SERVER_CONFIG = {

@@ -330,27 +330,175 @@ def process_documents():
 
 ## 第5章：会話の心臓 - APIサーバーの実装
 
-### 🚀 FastAPIサーバーの構造
+「太郎くん、いよいよAIおばあちゃんの心臓部分を作っていきましょう」
+
+太郎は少し緊張した。「サーバーって聞くと難しそう...」
+
+「大丈夫よ。レストランで例えると、お客さん（フロントエンド）から注文（質問）を受けて、シェフ（AI）に伝えて、料理（回答）を運ぶウェイター（APIサーバー）のようなものよ」
+
+### 📚 初学者のための基礎知識
+
+#### 🤔 「APIサーバー」って何？
+
+**API**とは「Application Programming Interface」の略で、簡単に言うと「プログラム同士の会話のルール」です。
+
+```
+👤 ユーザー → 🌐 Webページ → 📡 APIサーバー → 🤖 AI → 💬 回答
+```
+
+**身近な例で理解しよう：**
+- **レストランの注文システム**: お客さん→ウェイター→キッチン→料理→お客さん
+- **銀行のATM**: あなた→ATM画面→銀行システム→残高情報→ATM画面
+- **AIおばあちゃん**: あなた→Webページ→APIサーバー→AI→回答→Webページ
+
+#### 🔧 「FastAPI」を選ぶ理由
+
+**FastAPI**は、Pythonで作られたWebサーバーフレームワークです。
 
 ```python
-# server.py の主要部分
-from fastapi import FastAPI, HTTPException, Depends
-from langchain.chains import RetrievalQA
-from langchain_openai import ChatOpenAI
+# 他のフレームワークとの比較（初心者向け）
+
+# Flask（シンプルだが機能が少ない）
+@app.route('/hello')
+def hello():
+    return "Hello World"
+
+# Django（多機能だが複雑）
+# 設定ファイル多数、学習コストが高い
+
+# FastAPI（ちょうどいい！）
+@app.get("/hello")
+async def hello():
+    return {"message": "Hello World"}
+```
+
+**FastAPIの魅力：**
+- 📝 **自動ドキュメント生成** → コードを書くだけでAPI説明書ができる
+- ⚡ **高速** → PythonのWebフレームワークの中で最速クラス
+- 🔒 **型チェック** → バグを事前に発見できる
+- 📱 **簡単** → 少ないコードで多機能を実現
+
+### 🚀 FastAPIサーバーの構造解説
+
+#### 🔍 全体の設計図を理解しよう
+
+```python
+# server.py の主要部分（初学者向け詳細解説）
+
+# 📦 必要なライブラリをインポート
+from fastapi import FastAPI, HTTPException, Depends  # Webサーバー機能
+from langchain.chains import RetrievalQA             # RAG処理の中核
+from langchain_openai import ChatOpenAI              # OpenAI GPTとの接続
 
 class RAGServer:
+    """
+    🧠 AIおばあちゃんの脳みそクラス
+    
+    このクラスが行うこと：
+    - 質問を受け取る
+    - 関連する料理レシピを探す
+    - AIに質問と情報を渡す
+    - 回答を整形して返す
+    """
+    
     def __init__(self):
-        self.vector_store = None
-        self.qa_chain = None
-        self.embeddings = OpenAIEmbeddings()
+        """🎯 初期化：AIおばあちゃんの準備をする"""
+        self.vector_store = None      # 📚 レシピの記憶庫（後で設定）
+        self.qa_chain = None          # 🔗 質問→回答の処理チェーン
+        self.embeddings = OpenAIEmbeddings()  # 🔢 文章をベクトルに変換する道具
     
     def process_query(self, query: str):
-        # 1. 質問を受け取る
-        # 2. 関連情報を検索
-        # 3. LLMで回答生成
-        # 4. 結果を返す
-        pass
+        """
+        🍳 メインの料理メソッド：質問から回答を作る
+        
+        【処理の流れ（料理に例えると）】
+        1. 何語で話しているか確認（客の言語チェック）
+        2. 材料を探す（レシピデータベース検索）
+        3. 材料を整理（情報をまとめる）
+        4. 調理方法を決める（プロンプト作成）
+        5. 料理する（AI推論）
+        6. 盛り付け（回答の整形）
+        """
+        try:
+            # 🌍 ステップ1: この質問は日本語？英語？
+            language = self.detect_language(query)
+            # 📝 ログに記録（デバッグ時に便利）
+            logging.info(f"検出言語: {language} | 質問: {query[:50]}...")
+            
+            # 🔍 ステップ2: 関連するレシピ情報を探索
+            # 例：「親子丼」→ 親子丼レシピ、鶏肉料理、卵料理などを検索
+            relevant_docs = self.vector_store.similarity_search(
+                query,           # 検索クエリ（ユーザーの質問）
+                k=4             # 上位4件だけ取得（多すぎると混乱する）
+            )
+            logging.info(f"関連文書数: {len(relevant_docs)}")
+            
+            # 📋 ステップ3: 見つけた情報をまとめる
+            # 複数のレシピ情報を1つの文章に結合
+            context = "\n\n".join([doc.page_content for doc in relevant_docs])
+            
+            # 🎯 ステップ4: AIへの指示書（プロンプト）を作成
+            # 質問の種類に応じて最適な指示を選択
+            prompt_template = self.get_dynamic_prompt_template(query)
+            final_prompt = prompt_template.format(
+                context=context,     # 見つけたレシピ情報
+                question=query       # ユーザーの質問
+            )
+            
+            # 🤖 ステップ5: AIに推論してもらう
+            # LangChainが質問と情報をGPTに送って回答をもらう
+            response = self.qa_chain.run({
+                "input_documents": relevant_docs,  # 参考文書
+                "question": query                  # 質問
+            })
+            
+            # ✨ ステップ6: 回答を読みやすく整形
+            # 言語に応じて敬語や絵文字を追加
+            formatted_response = self.format_response(response, language)
+            
+            # 📊 処理完了をログに記録
+            logging.info(f"回答生成完了: {len(formatted_response)}文字")
+            return formatted_response
+            
+        except Exception as e:
+            # 🚨 エラーが発生した場合の対処
+            logging.error(f"クエリ処理エラー: {str(e)}")
+            return self.get_error_response(language)
 ```
+
+#### 💡 初学者向け：このコードの重要ポイント
+
+**🤔 なぜ`try-except`を使うの？**
+```python
+try:
+    # 普通の処理
+    result = process_something()
+except Exception as e:
+    # エラーが起きた時の処理
+    return "エラーが発生しました"
+```
+プログラムは時々失敗します（ネットワークエラー、API制限など）。`try-except`は「もしエラーが起きても、プログラムを止めずに適切に対処する」ための仕組みです。
+
+**🔍 `similarity_search`の魔法**
+```python
+# ユーザーが「親子丼の作り方」と質問すると...
+query = "親子丼の作り方"
+
+# AIが自動で関連情報を見つけてくれる
+results = [
+    "親子丼のレシピ情報",      # 最も関連度が高い
+    "鶏肉の調理法",           # 2番目
+    "卵の調理法",             # 3番目
+    "どんぶり料理の基本"      # 4番目
+]
+```
+
+**📝 `logging`でデバッグ**
+```python
+logging.info("何が起こっているかを記録")
+# → 2024-01-15 10:30:15 - INFO - 何が起こっているかを記録
+```
+これは「プログラムの日記」のようなもの。何が起こったかを記録して、問題が起きた時に原因を探せます。
 
 ### 🔍 言語検出の魔法
 
@@ -389,28 +537,219 @@ async def process_query_streaming(self, query: str):
         yield f"data: {json.dumps({'text': chunk.get('result', '')})}\n\n"
 ```
 
+### 🧠 動的プロンプト生成の仕組み
+
+```python
+def get_dynamic_prompt_template(self, query: str) -> str:
+    """
+    質問の内容に応じて最適なプロンプトテンプレートを選択
+    """
+    # 料理関連のキーワード検出
+    cooking_keywords = ['作り方', '材料', 'レシピ', 'how to make', 'ingredients']
+    
+    if any(keyword in query.lower() for keyword in cooking_keywords):
+        return """
+あなたは料理の専門家です。以下のレシピ情報を参考に、具体的で実用的な回答をしてください。
+
+レシピ情報:
+{context}
+
+質問: {question}
+
+回答は以下の形式で：
+📋 材料
+👩‍🍳 作り方
+💡 コツ・ポイント
+"""
+    else:
+        return """
+以下の情報を参考に、質問に正確に答えてください：
+
+参考情報:
+{context}
+
+質問: {question}
+"""
+
+def format_response(self, response: str, language: str) -> str:
+    """
+    回答を言語と形式に応じて整形
+    """
+    if language == 'japanese':
+        # 日本語の場合、敬語や絵文字を追加
+        if not response.startswith('申し訳'):
+            response = f"🍜 おばあちゃんからのアドバイス\n\n{response}"
+    
+    return response
+
+def get_error_response(self, language: str) -> str:
+    """
+    エラー時の適切なレスポンス
+    """
+    if language == 'japanese':
+        return "申し訳ございません。少し調子が悪いようです。もう一度お試しください。"
+    else:
+        return "I'm sorry, something went wrong. Please try again."
+```
+
 ### 🔐 認証システム
 
 ```python
-# JWT認証
-def create_access_token(data: dict) -> str:
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(hours=24)
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, Config.JWT_SECRET_KEY, algorithm="HS256")
+# JWT認証の完全実装
+class AuthManager:
+    def __init__(self):
+        self.secret_key = Config.JWT_SECRET_KEY
+        self.algorithm = "HS256"
+        self.access_token_expire = timedelta(hours=24)
+    
+    def create_access_token(self, data: dict) -> str:
+        """アクセストークンを生成"""
+        to_encode = data.copy()
+        expire = datetime.utcnow() + self.access_token_expire
+        to_encode.update({"exp": expire})
+        
+        try:
+            token = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
+            logging.info(f"トークン生成成功: ユーザー {data.get('sub', 'unknown')}")
+            return token
+        except Exception as e:
+            logging.error(f"トークン生成エラー: {str(e)}")
+            raise HTTPException(status_code=500, detail="トークン生成に失敗しました")
+    
+    def verify_token(self, token: str) -> dict:
+        """トークンを検証してペイロードを返す"""
+        try:
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            username: str = payload.get("sub")
+            if username is None:
+                raise HTTPException(status_code=401, detail="無効なトークンです")
+            return payload
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail="トークンが期限切れです")
+        except jwt.JWTError:
+            raise HTTPException(status_code=401, detail="トークンが無効です")
+
+# 依存性注入でトークン検証
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    """現在のユーザーを取得"""
+    auth_manager = AuthManager()
+    return auth_manager.verify_token(token)
+```
+
+### 📊 ログ出力とモニタリング
+
+```python
+import logging
+from datetime import datetime
+
+# 詳細なログ設定
+def setup_logging():
+    """ログ設定の初期化"""
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler('rag_server.log'),
+            logging.StreamHandler()
+        ]
+    )
+
+class QueryLogger:
+    """クエリ処理のログを詳細に記録"""
+    
+    @staticmethod
+    def log_query_start(query: str, user_id: str = None):
+        logging.info(f"🔍 クエリ開始 | ユーザー: {user_id} | 質問: {query[:100]}...")
+    
+    @staticmethod
+    def log_vector_search(query: str, results_count: int, search_time: float):
+        logging.info(f"🔍 ベクトル検索完了 | 結果数: {results_count} | 検索時間: {search_time:.2f}秒")
+    
+    @staticmethod
+    def log_llm_response(response_length: int, processing_time: float):
+        logging.info(f"🤖 LLM応答完了 | 文字数: {response_length} | 処理時間: {processing_time:.2f}秒")
+    
+    @staticmethod
+    def log_error(error: str, query: str):
+        logging.error(f"❌ エラー発生 | 質問: {query[:50]} | エラー: {error}")
 ```
 
 ---
 
 ## 第6章：美しい顔 - フロントエンドの作成
 
-### 🎨 Tailwind CSSで美しいUI
+「太郎くん、今度はAIおばあちゃんの顔を作りましょう」
+
+太郎は首をかしげた。「顔？」
+
+「そう、フロントエンドよ。ユーザーが実際に見て触る部分。美しくて使いやすいインターフェースを作るの。料理で言うと『盛り付け』ね」
+
+### 📚 初学者のための基礎知識
+
+#### 🤔 「フロントエンド」って何？
+
+**フロントエンド**とは、ユーザーが直接見て操作する部分のことです。
+
+```
+🖥️ フロントエンド（見える部分）
+├── HTML → 骨格（建物の構造）
+├── CSS  → 見た目（インテリア装飾）
+└── JavaScript → 動き（電気設備）
+
+📡 バックエンド（見えない部分）
+├── サーバー → 脳みそ（処理をする）
+├── データベース → 記憶（情報を保存）
+└── API → 橋渡し（やり取りの仕組み）
+```
+
+**身近な例で理解：**
+- **レストラン**: 客席（フロント）← → 厨房（バック）
+- **銀行**: ATM画面（フロント）← → 銀行システム（バック）
+- **スマホアプリ**: アプリ画面（フロント）← → サーバー（バック）
+
+#### 🎨 「Tailwind CSS」を選ぶ理由
+
+**CSS**は見た目を作る言語ですが、**Tailwind CSS**はより簡単にきれいなデザインを作れるツールです。
 
 ```html
-<!-- RAG_demo.html の抜粋 -->
+<!-- 普通のCSS（面倒） -->
+<style>
+.button {
+    background-color: blue;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+}
+</style>
+<button class="button">クリック</button>
+
+<!-- Tailwind CSS（簡単！） -->
+<button class="bg-blue-500 text-white px-5 py-2 rounded border-none">
+    クリック
+</button>
+```
+
+**Tailwindの魅力：**
+- 🚀 **書きやすい** → HTMLに直接スタイルを書ける
+- 🎨 **美しい** → プロ並みのデザインが簡単に
+- 📱 **レスポンシブ** → スマホ・タブレット対応が楽
+- ⚡ **高速** → 必要な部分だけを読み込む
+
+### 🎨 Tailwind CSSで美しいUI作り
+
+#### 🏗️ 基本構造の理解
+
+```html
+<!-- RAG_demo.html の抜粋（初学者向け解説付き） -->
+
+<!-- 🏠 メインコンテナ：ページ全体の背景を作る -->
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <!-- 📏 コンテンツ幅制限：中央寄せで読みやすくする -->
     <div class="max-w-4xl mx-auto p-6">
+        <!-- 💳 カード風デザイン：内容をきれいにまとめる -->
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <!-- 🎨 ヘッダー部分：グラデーション背景で目立たせる -->
             <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-6">
                 <h1 class="text-3xl font-bold text-white">
                     🍜 RAG Starter Kit Demo
@@ -421,36 +760,634 @@ def create_access_token(data: dict) -> str:
 </div>
 ```
 
-### ⌨️ キーボードショートカット
+#### 💡 Tailwind CSSクラス名の意味解説
+
+**🏠 レイアウト関連**
+```css
+min-h-screen    → 最小高さを画面全体に（スマホでも縦いっぱい）
+max-w-4xl      → 最大幅を制限（読みやすい幅にする）
+mx-auto        → 左右中央寄せ（m=margin, x=水平, auto=自動）
+p-6            → 内側の余白を6単位（p=padding）
+```
+
+**🎨 見た目関連**
+```css
+bg-white                    → 背景色を白に
+bg-gradient-to-br          → 右下向きのグラデーション
+from-blue-50 to-indigo-100 → 薄い青から薄い紫へ
+rounded-2xl                → 角を大きく丸く
+shadow-xl                  → 大きな影をつける
+```
+
+**📝 文字関連**
+```css
+text-3xl       → 文字サイズを大きく（3XLサイズ）
+font-bold      → 文字を太く
+text-white     → 文字色を白に
+```
+
+### ⌨️ キーボードショートカットの魔法
+
+#### 🎯 なぜキーボードショートカットが重要？
+
+ユーザーは「マウスでボタンを押す」より「キーボードで素早く操作」を好みます。
 
 ```javascript
-// Cmd+Enter / Ctrl+Enter でクエリ実行
+// 🚀 Cmd+Enter / Ctrl+Enter でクエリ実行（初学者向け解説）
+
 document.addEventListener('keydown', function(e) {
+    // 🔍 解説：「キーが押された時」を監視
+    
+    // Macでは「Cmd」、WindowsでSは「Ctrl」キーをチェック
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        // 🛑 ブラウザのデフォルト動作を停止
         e.preventDefault();
+        
+        // ボタンが無効でなければ送信実行
         if (!submitButton.disabled) {
-            submitQuery();
+            submitQuery();  // 質問送信関数を呼び出し
         }
     }
 });
 ```
 
-### 💫 リアルタイム応答表示
+#### 🤔 初学者が混乱しやすいポイント
+
+**❓ `e.metaKey`と`e.ctrlKey`って何？**
+```javascript
+// OS別のキー対応
+if (isMac) {
+    // Macの場合：⌘ Command キー
+    console.log(e.metaKey);  // true/false
+} else {
+    // Windowsの場合：Ctrl キー  
+    console.log(e.ctrlKey);  // true/false
+}
+
+// 両方に対応する書き方
+if (e.metaKey || e.ctrlKey) {
+    console.log("特殊キーが押された！");
+}
+```
+
+**❓ `e.preventDefault()`って何をしてるの？**
+```javascript
+// preventDefault()がない場合
+// → ブラウザが「Enter」の標準動作（改行など）をしてしまう
+
+// preventDefault()がある場合  
+// → ブラウザの標準動作を無効化して、自分の処理だけ実行
+e.preventDefault();
+```
+
+**❓ なぜ`!submitButton.disabled`をチェック？**
+```javascript
+// 安全な処理の例
+if (!submitButton.disabled) {
+    // ボタンが「有効」な時だけ実行
+    submitQuery();
+} else {
+    // ボタンが「無効」な時は何もしない
+    // 例：既に送信中、入力が空、エラー状態など
+    console.log("送信できない状態です");
+}
+```
+
+### 💫 リアルタイム応答表示の詳細実装
+
+#### 🚀 完全なフロントエンド実装
+
+#### 🏗️ クラス設計の理解
+
+まず「クラス」について理解しましょう。
 
 ```javascript
-// Server-Sent Events でストリーミング
-const eventSource = new EventSource('/query/stream', {
-    method: 'POST',
-    headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+// 🏠 クラス = 設計図（家の設計図のようなもの）
+class RAGChatInterface {
+    // 🔧 constructor = 家を建てる時の初期工事
+    constructor() {
+        // 🔑 認証トークンを取得（ログイン情報）
+        this.token = localStorage.getItem('access_token');
+        
+        // 🚦 送信中かどうかのフラグ（信号機のようなもの）
+        this.isStreaming = false;
+        
+        // 🔌 サーバーとの接続管理（電話回線のようなもの）
+        this.currentEventSource = null;
+        
+        // 🎯 DOM要素を見つけて記憶
+        this.initializeElements();
+        
+        // 👂 イベントリスナーを設定（耳を澄ませる）
+        this.setupEventListeners();
     }
+```
+
+#### 🤔 初学者が疑問に思うポイント
+
+**❓ `this.`って何？**
+```javascript
+// クラス内での「自分自身」を指す代名詞
+class Person {
+    constructor(name) {
+        this.name = name;  // 「この人の名前」
+        this.age = 0;      // 「この人の年齢」
+    }
+    
+    introduce() {
+        // 「この人の名前」を使って自己紹介
+        console.log(`私の名前は${this.name}です`);
+    }
+}
+
+// 実際に使う時
+const taro = new Person("太郎");
+taro.introduce();  // "私の名前は太郎です"
+```
+
+**❓ `localStorage`って何？**
+```javascript
+// ブラウザの「メモ帳」のようなもの
+// ページを閉じても情報が残る
+
+// 保存
+localStorage.setItem('user_name', '太郎');
+
+// 取得  
+const name = localStorage.getItem('user_name');
+console.log(name);  // "太郎"
+
+// 削除
+localStorage.removeItem('user_name');
+```
+
+**❓ なぜ`initializeElements()`を分ける？**
+```javascript
+// ❌ 悪い例：全部constructorに書く
+constructor() {
+    this.button = document.getElementById('button');
+    this.input = document.getElementById('input');
+    this.output = document.getElementById('output');
+    // 長すぎて読みにくい...
+}
+
+// ✅ 良い例：機能ごとに分ける
+constructor() {
+    this.initializeElements();  // 要素の取得
+    this.setupEventListeners(); // イベントの設定
+    // すっきり！
+}
+
+initializeElements() {
+    // DOM要素取得だけに集中
+    this.button = document.getElementById('button');
+    this.input = document.getElementById('input');
+    this.output = document.getElementById('output');
+}
+```
+    
+    initializeElements() {
+        // DOM要素の取得
+        this.queryInput = document.getElementById('queryInput');
+        this.submitButton = document.getElementById('submitQuery');
+        this.responseDiv = document.getElementById('response');
+        this.loadingDiv = document.getElementById('loading');
+        this.typingIndicator = document.getElementById('typingIndicator');
+    }
+    
+    setupEventListeners() {
+        // 送信ボタンのイベント
+        this.submitButton.addEventListener('click', () => this.submitQuery());
+        
+        // Enter キーでの送信（Shift+Enterは改行）
+        this.queryInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.submitQuery();
+            }
+        });
+        
+        // Cmd/Ctrl + Enter でも送信可能
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (!this.submitButton.disabled) {
+                    this.submitQuery();
+                }
+            }
+        });
+        
+        // 入力中のリアルタイム検証
+        this.queryInput.addEventListener('input', () => {
+            this.validateInput();
+        });
+    }
+    
+    validateInput() {
+        const query = this.queryInput.value.trim();
+        this.submitButton.disabled = query.length === 0 || this.isStreaming;
+        
+        // 文字数カウンターの更新
+        const charCount = document.getElementById('charCount');
+        if (charCount) {
+            charCount.textContent = `${query.length}/500`;
+            charCount.className = query.length > 400 ? 'text-red-500' : 'text-gray-500';
+        }
+    }
+    
+    async submitQuery() {
+        const query = this.queryInput.value.trim();
+        if (!query || this.isStreaming) return;
+        
+        try {
+            // UI状態の更新
+            this.setLoadingState(true);
+            this.displayUserMessage(query);
+            this.queryInput.value = '';
+            
+            // ストリーミングレスポンスの開始
+            await this.streamResponse(query);
+            
+        } catch (error) {
+            this.handleError(error);
+        } finally {
+            this.setLoadingState(false);
+        }
+    }
+    
+    displayUserMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'mb-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500';
+        messageDiv.innerHTML = `
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl">🧑‍💻</span>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-blue-800">あなた</p>
+                    <p class="text-blue-700">${this.escapeHtml(message)}</p>
+                </div>
+            </div>
+        `;
+        this.responseDiv.appendChild(messageDiv);
+        this.scrollToBottom();
+    }
+    
+    async streamResponse(query) {
+        return new Promise((resolve, reject) => {
+            // 既存のEventSourceがあれば閉じる
+            if (this.currentEventSource) {
+                this.currentEventSource.close();
+            }
+            
+            // AIの応答エリアを作成
+            const aiResponseDiv = this.createAIResponseDiv();
+            const contentDiv = aiResponseDiv.querySelector('.ai-content');
+            
+            // EventSourceでストリーミング開始
+            const eventSource = new EventSource(
+                `/query/stream?query=${encodeURIComponent(query)}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${this.token}`
+                    }
+                }
+            );
+            
+            this.currentEventSource = eventSource;
+            
+            eventSource.onopen = () => {
+                console.log('🚀 ストリーミング開始');
+                this.showTypingIndicator();
+            };
+            
+            eventSource.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.type === 'content') {
+                        // テキストを追加（マークダウンレンダリング対応）
+                        contentDiv.innerHTML = this.renderMarkdown(data.text);
+                        this.scrollToBottom();
+                    } else if (data.type === 'error') {
+                        throw new Error(data.message);
+                    } else if (data.type === 'done') {
+                        // ストリーミング完了
+                        this.hideTypingIndicator();
+                        eventSource.close();
+                        resolve();
+                    }
+                } catch (error) {
+                    console.error('ストリーミングデータ解析エラー:', error);
+                    reject(error);
+                }
+            };
+            
+            eventSource.onerror = (error) => {
+                console.error('EventSource エラー:', error);
+                this.hideTypingIndicator();
+                eventSource.close();
+                reject(new Error('サーバーとの接続に問題が発生しました'));
+            };
+            
+            // タイムアウト設定（30秒）
+            setTimeout(() => {
+                if (eventSource.readyState === EventSource.OPEN) {
+                    eventSource.close();
+                    reject(new Error('応答がタイムアウトしました'));
+                }
+            }, 30000);
+        });
+    }
+    
+    createAIResponseDiv() {
+        const responseDiv = document.createElement('div');
+        responseDiv.className = 'mb-4 p-4 bg-green-50 rounded-lg border-l-4 border-green-500';
+        responseDiv.innerHTML = `
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl">🤖</span>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium text-green-800">AIおばあちゃん</p>
+                    <div class="ai-content text-green-700 prose prose-green max-w-none">
+                        <!-- ここにストリーミングコンテンツが入る -->
+                    </div>
+                </div>
+            </div>
+        `;
+        this.responseDiv.appendChild(responseDiv);
+        return responseDiv;
+    }
+    
+    renderMarkdown(text) {
+        // 簡単なマークダウンレンダリング
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **太字**
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')              // *イタリック*
+            .replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 rounded">$1</code>')  // `コード`
+            .replace(/\n/g, '<br>');                           // 改行
+    }
+    
+    showTypingIndicator() {
+        if (this.typingIndicator) {
+            this.typingIndicator.style.display = 'block';
+            this.typingIndicator.innerHTML = `
+                <div class="flex items-center space-x-2 text-gray-500">
+                    <div class="typing-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <span>AIおばあちゃんが考えています...</span>
+                </div>
+            `;
+        }
+    }
+    
+    hideTypingIndicator() {
+        if (this.typingIndicator) {
+            this.typingIndicator.style.display = 'none';
+        }
+    }
+    
+    setLoadingState(isLoading) {
+        this.isStreaming = isLoading;
+        this.submitButton.disabled = isLoading;
+        this.submitButton.textContent = isLoading ? '送信中...' : '送信';
+        this.validateInput();  // ボタン状態を再評価
+    }
+    
+    handleError(error) {
+        console.error('Error:', error);
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'mb-4 p-4 bg-red-50 rounded-lg border-l-4 border-red-500';
+        errorDiv.innerHTML = `
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl">⚠️</span>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-red-800">エラー</p>
+                    <p class="text-red-700">${this.escapeHtml(error.message)}</p>
+                    <button onclick="location.reload()" 
+                            class="mt-2 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                        ページを再読み込み
+                    </button>
+                </div>
+            </div>
+        `;
+        this.responseDiv.appendChild(errorDiv);
+        this.scrollToBottom();
+    }
+    
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    scrollToBottom() {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+}
+
+// ページ読み込み完了後に初期化
+document.addEventListener('DOMContentLoaded', () => {
+    window.ragChat = new RAGChatInterface();
+});
+```
+
+#### 🎨 タイピングアニメーションのCSS
+
+```css
+/* タイピングインジケーターのアニメーション */
+.typing-dots {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.typing-dots span {
+    height: 8px;
+    width: 8px;
+    background-color: #6b7280;
+    border-radius: 50%;
+    display: inline-block;
+    animation: typing-bounce 1.4s ease-in-out infinite both;
+}
+
+.typing-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes typing-bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .ai-content {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .typing-dots span {
+        height: 6px;
+        width: 6px;
+    }
+}
+```
+
+#### 🔄 バックエンドとの連携（server.py側）
+
+```python
+@app.get("/query/stream")
+async def stream_query(
+    query: str = Query(..., description="ユーザーの質問"),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    ストリーミング形式でRAG回答を生成
+    """
+    async def generate_stream():
+        try:
+            # ログ記録
+            QueryLogger.log_query_start(query, current_user.get('sub'))
+            
+            # ヘッダー送信
+            yield f"data: {json.dumps({'type': 'start', 'message': 'ストリーミング開始'})}\n\n"
+            
+            # RAG処理の実行（ストリーミング対応）
+            rag_server = RAGServer()
+            
+            accumulated_response = ""
+            async for chunk in rag_server.process_query_streaming(query):
+                accumulated_response += chunk
+                
+                # フロントエンドにチャンク送信
+                yield f"data: {json.dumps({'type': 'content', 'text': accumulated_response})}\n\n"
+                
+                # 少し待つ（自然なタイピング効果）
+                await asyncio.sleep(0.05)
+            
+            # 完了通知
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
+            
+        except Exception as e:
+            # エラー通知
+            error_message = f"申し訳ございません。エラーが発生しました: {str(e)}"
+            yield f"data: {json.dumps({'type': 'error', 'message': error_message})}\n\n"
+    
+    return StreamingResponse(
+        generate_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        }
+    )
+```
+
+#### 🚨 初学者がつまずきやすいポイント
+
+**🔍 問題1: 「Server-Sent Eventsって何？」**
+
+```javascript
+// 🤔 普通のHTTP通信（一回きり）
+fetch('/api/question', {
+    method: 'POST',
+    body: JSON.stringify({question: '親子丼の作り方'})
+})
+.then(response => response.json())
+.then(data => {
+    console.log(data.answer);  // 回答が一気に表示
 });
 
-eventSource.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    responseDiv.innerHTML += data.text;
+// ✨ Server-Sent Events（リアルタイム）
+const eventSource = new EventSource('/api/stream');
+eventSource.onmessage = (event) => {
+    const chunk = event.data;
+    console.log(chunk);  // 文字が少しずつ流れてくる
 };
+```
+
+**📱 問題2: 「非同期処理が分からない」**
+
+```javascript
+// ❌ 同期処理（待機してしまう）
+function badExample() {
+    console.log("1. 処理開始");
+    
+    // この処理が終わるまで次に進まない（ブラウザが固まる）
+    const result = heavyProcessing();  // 3秒かかる処理
+    
+    console.log("2. 処理完了");
+    console.log(result);
+}
+
+// ✅ 非同期処理（他の作業も並行）
+async function goodExample() {
+    console.log("1. 処理開始");
+    
+    // この処理は「別のスレッド」で実行（ブラウザは固まらない）
+    const result = await heavyProcessingAsync();  // 3秒かかる処理
+    
+    console.log("2. 処理完了");
+    console.log(result);
+}
+```
+
+#### 🎯 実際の動作イメージ
+
+**Step 1: ユーザーが質問を入力**
+```
+👤 ユーザー: "親子丼の作り方を教えて"
+📝 入力フィールド: [親子丼の作り方を教えて]
+🔘 送信ボタン: [送信] ← クリック
+```
+
+**Step 2: フロントエンドの処理**
+```javascript
+// 📤 1. 質問をサーバーに送信
+eventSource = new EventSource(`/query/stream?query=親子丼の作り方を教えて`);
+
+// 👂 2. サーバーからの応答を待機
+eventSource.onmessage = (event) => {
+    // 📨 3. 文字が少しずつ届く
+    updateResponse(event.data);
+};
+```
+
+**Step 3: リアルタイム表示**
+```
+💭 AIの思考プロセス（ユーザーには見えない）:
+  🔍 「親子丼」の情報を検索中...
+  📚 関連レシピを4件発見
+  🤖 GPTに質問を送信中...
+
+📺 ユーザーに表示される内容:
+  「おばあちゃんの秘伝レシピによると...」
+  「親子丼の美味しさの秘密は...」  ← リアルタイムで追加
+  「材料（2人分）:」             ← さらに追加
+  「- 鶏もも肉 200g...」         ← 続々と追加
+```
+
+**Step 4: 完成**
+```
+✅ 完全な回答が表示される
+🎯 ユーザーは「AIが考えながら答えている」体験を得る
+💡 単なる回答より「親しみやすさ」を感じる
 ```
 
 ---
