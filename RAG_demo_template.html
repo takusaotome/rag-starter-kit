@@ -190,13 +190,13 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
                         <input type="text" id="username" 
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-                               placeholder="Enter username">
+                               placeholder="Enter username (Press Enter to login)">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
                         <input type="password" id="password" 
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-                               placeholder="Enter password">
+                               placeholder="Enter password (Press Enter to login)">
                     </div>
                     <div>
                         <button onclick="login()" 
@@ -230,29 +230,14 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Your Question</label>
                         <textarea id="question" 
                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors resize-vertical"
-                                  placeholder="Ask about Japanese cooking, recipes, or techniques... (Enter to submit, Shift+Enter for new line)" 
+                                  placeholder="Ask any question... (Enter to submit, Shift+Enter for new line)" 
                                   rows="3"></textarea>
                         <p class="text-xs text-gray-500 mt-1">
                             💡 Tip: Press <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Enter</kbd> to submit, <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Shift</kbd> + <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Enter</kbd> for new line
                         </p>
                     </div>
                     
-                    <div class="flex justify-between items-center">
-                        <div class="flex space-x-2">
-                            <button onclick="setSampleQuestion('親子丼の作り方を教えて')" 
-                                    class="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-full hover:bg-blue-100 transition-colors">
-                                🍳 親子丼の作り方
-                            </button>
-                            <button onclick="setSampleQuestion('What is the best way to make sushi rice?')" 
-                                    class="text-sm bg-green-50 text-green-600 px-3 py-1 rounded-full hover:bg-green-100 transition-colors">
-                                🍣 Sushi Rice
-                            </button>
-                            <button onclick="setSampleQuestion('日本の調味料について教えて')" 
-                                    class="text-sm bg-purple-50 text-purple-600 px-3 py-1 rounded-full hover:bg-purple-100 transition-colors">
-                                🥄 調味料
-                            </button>
-                        </div>
-                        
+                    <div class="flex justify-end items-center">
                         <button onclick="askQuestion()" 
                                 class="bg-secondary hover:bg-green-600 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 flex items-center">
                             <span id="askText">🚀 Ask</span>
@@ -279,8 +264,8 @@
                 
                 <div id="answerContainer" class="min-h-[100px] p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <div id="emptyState" class="text-center text-gray-500 py-8">
-                        <div class="text-4xl mb-2">🍜</div>
-                        <p>Ask a question about Japanese cooking to get started!</p>
+                        <div class="text-4xl mb-2">🤖</div>
+                        <p>Ask any question to get started!</p>
                     </div>
                     
                     <div id="answerContent" class="hidden">
@@ -349,6 +334,11 @@
                     authToken = data.access_token;
                     showMessage('loginMessage', '✅ Login successful! You can now ask questions.', 'success');
                     loginText.textContent = '✅ Logged In';
+                    
+                    // ログイン成功後に質問入力欄にフォーカスを設定
+                    setTimeout(() => {
+                        document.getElementById('question').focus();
+                    }, 100);
                 } else {
                     showMessage('loginMessage', `❌ Login failed: ${data.detail || 'Invalid credentials'}`, 'error');
                     loginText.textContent = '🔑 Login';
@@ -516,6 +506,23 @@
             }
         }
 
+        // Login keyboard shortcut handler
+        function handleLoginKeyboardShortcut(event) {
+            // Check for Enter key
+            if (event.key === 'Enter') {
+                // Ignore Enter key during IME composition (Japanese input conversion)
+                if (event.isComposing || event.keyCode === 229) {
+                    return;
+                }
+                
+                // Only trigger if focus is on username or password field
+                if (event.target.id === 'username' || event.target.id === 'password') {
+                    event.preventDefault(); // Prevent default Enter behavior
+                    login(); // Execute login
+                }
+            }
+        }
+
         // Helper function to show messages
         function showMessage(elementId, message, type = 'info') {
             const element = document.getElementById(elementId);
@@ -527,6 +534,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Add IME-aware keyboard shortcut to question textarea
             document.getElementById('question').addEventListener('keydown', handleKeyboardShortcut);
+            
+            // Add login keyboard shortcuts to username and password fields
+            document.getElementById('username').addEventListener('keydown', handleLoginKeyboardShortcut);
+            document.getElementById('password').addEventListener('keydown', handleLoginKeyboardShortcut);
         });
         
         // Auto-login on page load for demo purposes

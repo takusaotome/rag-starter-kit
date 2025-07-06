@@ -30,13 +30,17 @@ class KnowledgeIngester:
         self.embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     
     def load_markdown_files(self) -> List[str]:
-        """Markdown file loading - implementation to pass tests"""
+        """Markdown file loading - includes subdirectories"""
         knowledge_dir = Path(self.knowledge_path)
         markdown_files = []
         
         if knowledge_dir.exists():
-            for md_file in knowledge_dir.glob("*.md"):
+            # Use **/*.md to recursively find all .md files in subdirectories
+            for md_file in knowledge_dir.glob("**/*.md"):
                 markdown_files.append(str(md_file))
+        
+        # Sort files for consistent processing order
+        markdown_files.sort()
         
         return markdown_files
     

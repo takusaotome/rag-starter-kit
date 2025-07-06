@@ -14,8 +14,9 @@ from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from langchain_openai import ChatOpenAI
 from langchain.chains import RetrievalQA
@@ -226,6 +227,8 @@ Please answer the question in English based on the following information.
         
         # QA chain is no longer needed as we use dynamic prompt templates
         # All processing is done directly in process_query methods
+        # Set qa_chain to True to indicate setup completion
+        self.qa_chain = True
         print("✅ Dynamic prompt template setup completed.")
         
     def process_query(self, query: str) -> Dict[str, Any]:
@@ -413,6 +416,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 静的ファイルを提供
+app.mount("/static", StaticFiles(directory="."), name="static")
+
 security = HTTPBearer()
 
 
@@ -451,6 +457,12 @@ async def root():
         "status": "running",
         "description": "Educational RAG system for learning AI development"
     }
+
+
+@app.get("/RAG_demo.html")
+async def demo_html():
+    """Serve demo HTML file"""
+    return FileResponse("RAG_demo.html", media_type="text/html")
 
 
 @app.get("/health")
@@ -516,6 +528,12 @@ class LoginRequest(BaseModel):
     """Login request model"""
     username: str
     password: str
+
+
+@app.options("/login")
+async def login_options():
+    """Handle CORS preflight for login endpoint"""
+    return {"message": "OK"}
 
 
 @app.post("/login")

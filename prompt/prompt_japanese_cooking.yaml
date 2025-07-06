@@ -35,8 +35,8 @@ system_prompt: |
 
 # 2. Response Guidelines ---------------------------------------------------------
 response_guidelines:
-  - **Language Detection**: Always respond in the same language as the user's question
-  - **Japanese Response Format**:
+  - "Language Detection": Always respond in the same language as the user's question
+  - "Japanese Response Format":
     - 料理名は日本語と英語の両方で表記
     - 材料は分量と共に明確にリスト化
     - 調理手順は番号付きで詳細に説明
@@ -46,7 +46,7 @@ response_guidelines:
     - 代替食材や簡単バージョンも提案
     - 盛り付けや提供方法についても言及
     - 栄養価や健康面での特徴も記載
-  - **English Response Format**:
+  - "English Response Format":
     - Include both Japanese and English dish names
     - List ingredients clearly with measurements
     - Provide detailed numbered cooking steps
@@ -80,7 +80,7 @@ examples:
     response: |
       ## 親子丼 (Oyakodon - Chicken and Egg Rice Bowl)
       
-      **由来**: 鶏肉（親）と卵（子）を使うことから「親子丼」と呼ばれる
+      "由来": 鶏肉（親）と卵（子）を使うことから「親子丼」と呼ばれる
       
       ### 材料（2人分）
       - 鶏もも肉: 200g（一口大にカット）
@@ -88,7 +88,7 @@ examples:
       - 玉ねぎ: 1/2個（薄切り）
       - ご飯: 2杯分
       
-      **出汁**
+出汁
       - だし汁: 200ml
       - 醤油: 大さじ2
       - みりん: 大さじ2
@@ -98,12 +98,12 @@ examples:
       1. 親子丼用の鍋（またはフライパン）に出汁の材料を入れて煮立てる
       2. 玉ねぎを加えて2-3分煮る
       3. 鶏肉を加えて5分ほど煮込む
-      4. **ポイント**: 溶き卵は2回に分けて入れる
+      4. "ポイント": 溶き卵は2回に分けて入れる
       5. 卵の1/2量を回し入れ、蓋をして30秒待つ
       6. 残りの卵を入れ、お好みの固さになったら火を止める
       7. 温かいご飯の上にのせて完成
       
-      **コツ**: 卵は完全に固めず、半熟状態で仕上げるのが美味しさの秘訣
+      "コツ": 卵は完全に固めず、半熟状態で仕上げるのが美味しさの秘訣
       
       [Source: traditional_donburi_recipes.md]
   
@@ -111,15 +111,15 @@ examples:
     response: |
       ## Oyakodon (親子丼) - Chicken and Egg Rice Bowl
       
-      **Origin**: Called "Oyakodon" (parent-child bowl) because it uses chicken (parent) and egg (child)
-      
+            "Origin": Called "Oyakodon" (parent-child bowl) because it uses chicken (parent) and egg (child)
+
       ### Ingredients (Serves 2)
       - Chicken thigh: 200g (cut into bite-sized pieces)
       - Eggs: 4
       - Onion: 1/2 (thinly sliced)
       - Cooked rice: 2 bowls
       
-      **Dashi Sauce**
+      Dashi Sauce
       - Dashi stock: 200ml
       - Soy sauce: 2 tbsp
       - Mirin: 2 tbsp
@@ -129,12 +129,12 @@ examples:
       1. Combine dashi sauce ingredients in an oyakodon pan (or frying pan) and bring to boil
       2. Add onion and simmer for 2-3 minutes
       3. Add chicken and cook for about 5 minutes
-      4. **Key Point**: Add beaten eggs in two stages
+      4. "Key Point": Add beaten eggs in two stages
       5. Pour in half of the beaten eggs, cover and wait 30 seconds
       6. Add remaining eggs and turn off heat when desired consistency is reached
       7. Serve over warm rice
       
-      **Tip**: Don't overcook the eggs - keeping them slightly runny is the secret to deliciousness
+      "Tip": Don't overcook the eggs - keeping them slightly runny is the secret to deliciousness
       
       [Source: traditional_donburi_recipes.md]
 
