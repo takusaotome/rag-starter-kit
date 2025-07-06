@@ -172,12 +172,15 @@
             <p class="text-gray-600 text-lg">
                 Intelligent Question Answering with Real-time Streaming
             </p>
+            <div id="demoModeIndicator" class="mt-2 text-sm text-blue-600 font-medium hidden">
+                🎯 Demo Mode: Auto-login enabled
+            </div>
         </header>
 
         <!-- Main Content -->
         <div class="space-y-6">
             <!-- Authentication Card -->
-            <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+            <div id="authCard" class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
                 <div class="flex items-center mb-4">
                     <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                         🔐
@@ -294,6 +297,21 @@
         // Server Configuration - Environment variable placeholder
         const serverUrl = 'http://localhost:8000';
         
+        // Demo Mode Configuration
+        // 🚀 DEMO MODE SWITCH:
+        // Set to true  → Automatic login with admin/test123 (authentication card hidden)
+        // Set to false → Manual login required (authentication card visible)
+        // 
+        // 📝 How to switch modes:
+        // 1. Change DEMO_MODE to true/false
+        // 2. Refresh the page
+        // 3. No other changes needed!
+        const DEMO_MODE = true;
+        const DEMO_CREDENTIALS = {
+            username: 'admin',
+            password: 'test123'
+        };
+        
         let authToken = null;
         let isStreaming = false;
         
@@ -302,15 +320,16 @@
             document.getElementById('question').value = question;
         }
         
-        // Login function
-        async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+        // Login function - supports both manual and automatic login
+        async function login(username = null, password = null) {
+            // Use provided credentials or get from form
+            const loginUsername = username || document.getElementById('username').value;
+            const loginPassword = password || document.getElementById('password').value;
             const loginText = document.getElementById('loginText');
             const loginSpinner = document.getElementById('loginSpinner');
             const loginMessage = document.getElementById('loginMessage');
             
-            if (!username || !password) {
+            if (!loginUsername || !loginPassword) {
                 showMessage('loginMessage', 'Please enter both username and password', 'error');
                 return;
             }
@@ -325,7 +344,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username: loginUsername, password: loginPassword })
                 });
                 
                 const data = await response.json();
@@ -351,11 +370,19 @@
             }
         }
         
+        // Automatic login for demo mode
+        async function autoLogin() {
+            console.log('🚀 Starting auto-login...', DEMO_CREDENTIALS);
+            await login(DEMO_CREDENTIALS.username, DEMO_CREDENTIALS.password);
+        }
+        
         // Ask question function
         async function askQuestion() {
             const question = document.getElementById('question').value.trim();
             const askText = document.getElementById('askText');
             const askSpinner = document.getElementById('askSpinner');
+            
+            console.log('🤔 Ask question called:', { question, authToken: !!authToken, isStreaming });
             
             if (!question) {
                 alert('Please enter a question');
@@ -368,6 +395,7 @@
             }
             
             if (isStreaming) {
+                console.log('⚠️ Already streaming, ignoring request');
                 return;
             }
             
@@ -386,6 +414,7 @@
             streamingAnswer.innerHTML = '';
             
             try {
+                console.log('📡 Sending request to:', `${serverUrl}/query/stream`);
                 const response = await fetch(`${serverUrl}/query/stream`, {
                     method: 'POST',
                     headers: {
@@ -395,6 +424,7 @@
                     body: JSON.stringify({ query: question })
                 });
                 
+                console.log('📡 Response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -422,11 +452,13 @@
                             
                             try {
                                 const json = JSON.parse(data);
+                                console.log('📝 Received token:', json);
                                 if (json.type === 'token') {
                                     if (isFirstToken) {
                                         streamingAnswer.innerHTML = '';
                                         accumulatedText = '';
                                         isFirstToken = false;
+                                        console.log('✨ First token received, initializing display');
                                     }
                                     
                                     // Accumulate the text
@@ -477,8 +509,10 @@
                 }
                 
             } catch (error) {
+                console.error('❌ Streaming error:', error);
                 streamingAnswer.innerHTML = `<div class="text-red-600 bg-red-50 p-4 rounded-lg">❌ Error: ${error.message}</div>`;
             } finally {
+                console.log('✅ Streaming completed, resetting state');
                 isStreaming = false;
                 askText.textContent = '🚀 Ask';
                 askSpinner.classList.add('hidden');
@@ -538,6 +572,24 @@
             // Add login keyboard shortcuts to username and password fields
             document.getElementById('username').addEventListener('keydown', handleLoginKeyboardShortcut);
             document.getElementById('password').addEventListener('keydown', handleLoginKeyboardShortcut);
+            
+            // Initialize demo mode or manual login mode
+            if (DEMO_MODE) {
+                // Hide authentication card in demo mode
+                document.getElementById('authCard').style.display = 'none';
+                
+                // Show demo mode indicator
+                document.getElementById('demoModeIndicator').classList.remove('hidden');
+                
+                // Automatically login after a short delay
+                setTimeout(autoLogin, 500);
+            } else {
+                // Show authentication card in manual mode
+                document.getElementById('authCard').style.display = 'block';
+                
+                // Hide demo mode indicator
+                document.getElementById('demoModeIndicator').classList.add('hidden');
+            }
         });
         
         // Auto-login on page load for demo purposes
