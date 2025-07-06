@@ -138,3 +138,8 @@ Thumbs.db
 
 # 記事・ドキュメント
 articles/ 
+# 環境変数ファイルのバックアップ・一時ファイル
+.env.backup
+.env.temp
+.env.bak
+.env.old
