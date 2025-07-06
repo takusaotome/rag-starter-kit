@@ -134,4 +134,7 @@ Thumbs.db
 
 # OS生成ファイル
 *.orig
-*.rej 
+*.rej
+
+# 記事・ドキュメント
+articles/ 
