@@ -76,9 +76,9 @@ python test_mcp_server.py
    {
      "mcpServers": {
        "rag-starter-kit": {
-         "command": "/Users/takueisaotome/PycharmProjects/rag-starter-kit/venv/bin/python",
+         "command": "~/path-to/rag-starter-kit/venv/bin/python",
          "args": [
-           "/Users/takueisaotome/PycharmProjects/rag-starter-kit/mcp_rag_server.py"
+           "~/path-to/rag-starter-kit/mcp_rag_server.py"
          ],
          "env": {
            "OPENAI_API_KEY": "sk-proj-YOUR_ACTUAL_API_KEY_HERE"
